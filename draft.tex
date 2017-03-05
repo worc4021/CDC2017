@@ -24,7 +24,7 @@
 			sortcites=true,
 			sorting=none,
 			style=numeric-comp,
-			giveninits=true,
+			firstinits=true,
 			doi=false,
 			isbn=false,
 			url=false
@@ -56,6 +56,10 @@
 \providecommand{\conv}{\text{conv}}
 \providecommand{\bfa}[1]{\mathbf{#1}}
 
+\usepackage{parskip}
+\setlength{\parskip}{8pt} 
+\setlength{\parindent}{0pt}
+
 \usepackage{xcolor}
 \def\edit{\textcolor{blue}}
 \allowdisplaybreaks[4]
@@ -70,6 +74,8 @@
 \DeclareFontSubstitution{U}{mathx}{m}{n}
 \DeclareMathSymbol{\temp}{\mathbin}{mathx}{'341}
 \newcommand{\bigominus}{\raisebox{10pt}{$\temp$}}
+
+\DeclareMathOperator*{\maximize}{maximize}
 
 \graphicspath{{./Pix/}}
 
@@ -89,7 +95,7 @@
 \begin{abstract} 
 For a certain class of stochastic programming problems we introduce a method to robustify the problem and thereby reduce the complexity while introducing a minimal amount of uncertainty.
 %
-An optimal auxiliary polytope is determined using a non-linear optimisation program, this auxiliary set can then be used to solve a deterministic problem guaranteeing probabilistic constraint satisfaction.
+An optimal auxiliary polytope is determined using a nonlinear optimisation program, this auxiliary set can then be used to solve a deterministic problem guaranteeing probabilistic constraint satisfaction.
 %
 We furthermore present a method to determine the probability measure of a polytope efficiently using Riemann-like sums over a grid.
 %
@@ -100,7 +106,6 @@ The proposed scheme is illustrated and compared with state-of-the-art alternativ
 
 \begin{keywords}
 keyword 1, keyword 2, keyword 3...
-\vskip-\baselineskip
 \end{keywords}
 %%%%%%%%%%%%%%%%%%%%%%%
 
@@ -112,7 +117,7 @@ keyword 1, keyword 2, keyword 3...
 %
 \noindent Optimisation problems with probabilistic constraints on the decision variable arise in various domains of science.
 %
-A prominent approach to solving such problems is by employing a scenario based approach~\cite{Calafiore:2010}, for which a deterministic optimisation program is solved for a sufficiently large number of sampled probabilistic constraints.
+A prominent approach to solving such problems is to employ a scenario based approach~\cite{Calafiore:2010}, for which a deterministic optimisation program is solved for a sufficiently large number of sampled probabilistic constraints.
 %
 This way constraint satisfaction with a chosen confidence is guaranteed, however the number of samples necessary generally depends on the dimension, the desired probability and confidence level and is often unnecessarily large.
 %
@@ -122,17 +127,19 @@ The trivial way would be to satisfy the probabilistic constraints with certainty
 %
 Here we present a more sophisticated approach, we determine an auxiliary subset of the uncertain variable for which the probabilistic constraints are satisfied.
 %
+
 To be able to determine such auxiliary sets we have to constrain the search space to polytopes of a given combinatorial structure.
 %
-This allows us to formulate a non-linear programming problem to determine an optimal auxiliary set which can then be used to robustify the original stochastic program introducing a minimal amount of conservatism.
+This allows us to formulate a nonlinear programming problem to determine an optimal auxiliary set which can then be used to robustify the original stochastic program introducing a minimal amount of conservatism.
 %
 We present a method to approximate the probability measure of the auxiliary set in a computationally tractable way using a grid based discretisation of the probability space.
 %
-\\[1em]
+
+
 %
-The remainder of this paper is structured as follows:
+This paper is structured as follows:
 %
-In Section~\ref{sec:problem:formulation} we present the problem description we consider, Section~\ref{sec:optimising:polytopes} discusses the proposed method to reduce the uncountably infinite dimensional optimisation problem introduced in Section~\ref{sec:problem:formulation} to a finite dimensional non-linear optimisation program.
+In Section~\ref{sec:problem:formulation} we present the problem description we consider, Section~\ref{sec:optimising:polytopes} discusses the proposed method to reduce the uncountably infinite dimensional optimisation problem introduced in Section~\ref{sec:problem:formulation} to a finite dimensional nonlinear optimisation program.
 %
 Section~\ref{sec:counting:cubes} deals with the problem of approximating the probability measure of a polytope using a homogeneous discretisation of the probability space, thereby reducing integrals into finite sums which can be efficiently evaluated.
 %
@@ -142,67 +149,73 @@ A method to determine a inhomogeneous discretisation of the probability space is
 %
 Section~\ref{sec:conclusion} concludes this work and gives possible future directions of research.
 %
-\\[1em]
+
+
 %
-Throughout this paper~$\mathbb R^d$ denotes the $d$-dimensional set of real numbers, the vector of all ones is denoted by~$\bfa{1}$, a $d$-dimensional polytope is the bounded intersection of a finite number of halfspaces or equivalently the convex hull of a finite number of points containing a $d$-dimensional ball, a face of a polytope is the intersection of a hyperplane with the polytope such that the polytope is on either one side of the hyperplane, the dimension of the face is the dimension of the affine hull of the intersection, one- two- and $d-1$-dimensional faces are called vertices, edges and facets respectively. 
+Throughout the paper we use the term \textit{$d$-dimensional polytope} to refer to a bounded set containing a $d$-dimensional ball and formed by the intersection of a finite number of halfspaces or equivalently by the convex hull of a finite number of points.
+A \textit{face} of a polytope is its intersection with a hyperplane such that the polytope lies on one side of the hyperplane; the dimension of the face is the dimension of the affine hull of this intersection; one-, two- and ${(d-1)}$-dimensional faces are called \textit{vertices}, \textit{edges} and \textit{facets} respectively. 
+We use $\mathcal Q \cong \mathcal S$ to indicate that polytopes~$\mathcal Q$ and $\mathcal S$ are \textit{combinatorially equivalent}.
 %
-Two polytopes~$\mathcal Q,\mathcal S$ are combinatorially equivalent if there exists a map between them which preserves the inclusion, i.e. if $q_i$ is a vertex of~$\mathcal Q$ and is contained in the edge~$e_j$ then the corresponding vertex~$s_i$ is contained in the corresponding edge~$f_j$ etc.
+The sets of real numbers and non-negative reals are denoted $\mathbb R$ and $\mathbb R_+$, and~$\bfa{1}$ is a vector of ones. 
+%
+For sets $\mathcal X,\mathcal Y\subseteq\mathbb R^d$, the Minkowski sum is denoted $\mathcal X \oplus \mathcal Y = \{ x + y : x\in\mathcal X, \ y\in \mathcal Y\}$, the Pontryagin difference is $\mathcal X \ominus \mathcal Y = \{ x: \forall y \in \mathcal Y, \ x+ y\in\mathcal X \}$, the image of $\mathcal X$ under a map $g:\mathbb R^d \to \mathbb R^q$ is denoted $g(\mathcal X) = \{z : \exists\, x\in\mathcal X, \ z = g(x)\}$, and $\mathscr P (\mathcal X)$ denotes the power set consisting of all subsets of $\mathcal X$.
+
+% Two polytopes~$\mathcal Q,\mathcal S$ are combinatorially equivalent if there exists a map between them which preserves the inclusion, i.e. if $q_i$ is a vertex of~$\mathcal Q$ and is contained in the edge~$e_j$ then the corresponding vertex~$s_i$ is contained in the corresponding edge~$f_j$ etc.
 %
 \section{Problem Formulation}\label{sec:problem:formulation}
 %
 %
 %
-\noindent Let~$f:\Sigma\rightarrow\mathbb R_+$ be a pseudo-measure on the measurable $\sigma$-algebra over~$\mathbb R^d$ and let~$g:\mathbb R^d\rightarrow \mathbb R^q$ be a measurable function.
-%
-\\[1em]
-%
-We consider the optimisation problem
+We consider an optimisation problem in which the decision variable is a subset of a given set $\Omega \subseteq \mathbb R^d$: 
 %
 \begin{subequations}\label{seq:main:problem}
 \begin{equation}
-\min_{\mathcal V} f(\mathcal V)
+\maximize_{\mathcal V\subseteq \Omega} \ f(\mathcal V)
 \end{equation}
 subject to
-\begin{equation}\label{eq:probabilistic:constraint:set:formulation}
-	\mathbb P\{v:g(v)\in\mathcal Y\;\forall v\in\mathcal V\}\geq p
-\end{equation}
-%
-\begin{equation}
-	\mathcal V\subseteq\Omega\subseteq \mathbb R^d
-\end{equation}
+\begin{align}
+\label{eq:probabilistic:constraint:set:formulation}
+        & \Pr \{ v : v\in\mathcal V \} \geq p \\
+\label{eq:inclusion:constraint:set:formulation}
+        & g(v)\in\mathcal Y \text{ for all } v \in \mathcal V.
+\end{align}
 \end{subequations}
 %
-where the decision variable~$\mathcal V$ in~\eqref{seq:main:problem} is a set.
+Here $f: \mathscr P (\Omega) \to \mathbb R_+$, $g:\mathbb R^d\rightarrow \mathbb R^q$, $\mathcal Y\subset\mathbb R^q$ is a given set, and $p\in (0,1]$ is a specified probability.
 %
-For clarity we can think of~$f$ as a concatenation of a measure and a set transformation, e.g.~$\mu(\mathcal X\ominus\mathcal V)$ for some set~$\mathcal X$ and some measure~$\mu$.
+For clarity we can think of~$f$ as the volume (or more generally the measure) of a set that depends on $\mathcal V$ (see for example Section~\ref{sec:example}, where $f(\mathcal V) = \text{vol}(\mathcal X\ominus\mathcal V)$ for a
+given set~$\mathcal X$).
+%where $\ominus$ denotes the Pontryagin set difference, i.e.~$\mathcal X\ominus \mathcal V = \{x: x + v \in \mathcal X \text{ for all } v\in\mathcal V\}$.
 %
-The probability space for which we consider to know the density function is~$(\Omega,\mathscr F,\mathbb P)$, i.e. the constraint~\eqref{eq:probabilistic:constraint:set:formulation} is equivalent to
+
+The probability space in~\eqref{eq:probabilistic:constraint:set:formulation} (for which we assume the density function is known) is~$(\mathscr P(\Omega), \mathscr F,\mathbb P)$. Hence the constraints~\eqref{eq:probabilistic:constraint:set:formulation} and \eqref{eq:inclusion:constraint:set:formulation}
+ are equivalent to
 %
 \begin{subequations}
-\begin{equation}
-	\mathbb P\{\mathcal V\}\geq p
-\end{equation}
+\begin{align}
+	& \mathbb P\{\mathcal V\}\geq p \\
+        & g(\mathcal V) \subseteq \mathcal Y .
+\end{align}
 %
-\begin{equation}
-	g(\mathcal V)\subseteq\mathcal Y.
-\end{equation}
+% \begin{equation}
+% 	g(\mathcal V)\subseteq\mathcal Y.
+% \end{equation}
 \end{subequations}
 %
-One key problem therefore is to determine the probability measure contained in the set variable~$\mathcal V$.
+A key problem is therefore to determine the probability measure of the set variable~$\mathcal V$.
 %
-In this work we consider~\eqref{seq:main:problem} where we constrain the decision variable~$\mathcal V$ to be polytopic and in particular to have a given \emph{combinatorial structure}, i.e.~$\mathcal V\cong\mathcal V_0$ for some~$\mathcal V_0$.
+In this work we consider problems of the form~\eqref{seq:main:problem} in which the decision variable~$\mathcal V$ is constrained to be polytopic. In particular we impose the constraint that $\mathcal V$ has a specific \emph{combinatorial structure}, i.e.~$\mathcal V\cong\mathcal V_0$ for a given set $\mathcal V_0$.
 %
-\\[1em]
-%
-In the remainder of this paper we discuss a method to approximate the solution of~\eqref{seq:main:problem} using conventional non-linear programming methods.
 
-\section{Optimising polytopes with a fixed combinatorial structure}\label{sec:optimising:polytopes}
+The focus of the remainder of this paper is on constructing a method of approximating the solution of~\eqref{seq:main:problem} using conventional nonlinear programming methods.
+
+\section{Optimising polytopes with fixed combinatorial structure}\label{sec:optimising:polytopes}
 %
 %
 %
-\noindent In order to derive an optimisation method for polytopes we have to recall the following definition:
+\noindent In order to derive an optimisation method for polytopes we recall the following definition:
 %
-\begin{defn}[See e.g.~\cite{Ziegler:1995}]
+\begin{defn}[\cite{Ziegler:1995}]
 The polytopes~$\mathcal Q$ and~$\mathcal S$ are combinatorially equivalent if there exists a map~$\mathcal T$ that maps~$\mathcal Q$ onto~$\mathcal S$ while preserving faces, i.e. vertices of~$\mathcal Q$ map to vertices of~$\mathcal T(\mathcal Q)=\mathcal S$, edges of~$\mathcal Q$ map to edges of~$\mathcal S$ and so on.
 \end{defn}
 %
@@ -229,86 +242,81 @@ Lemma~\ref{thm:combinatorial:equivalence} provides a canonical way to rewrite th
 %
 subject to
 %
-\begin{equation}\begin{aligned}
-	a_i v_j=b_i\; i\in\mathcal A_j\\
-	a_i v_j\leq b_i-\epsilon \; i\not\in\mathcal A_j
-\end{aligned}\end{equation}
+\begin{alignat}{2}
+        & a_i v_j=b_i, & & i\in\mathcal A_j\\
+	& a_i v_j\leq b_i-\epsilon, & & i\not\in\mathcal A_j \\
 %
-\begin{equation}
-	v_j\in\Omega \;\forall j\in\{1,\dots,N\}
-\end{equation}
+	& v_j\in\Omega,  & & j\in\{1,\dots,N\} \\
 %
-\begin{equation}
-	\mathcal V = \conv\{v_j\}_{j\in\{1,\dots,N\}}
-\end{equation}
+	& \mathcal V = \conv\{v_j\}_{j\in\{1,\dots,N\}} \\
 %
-\begin{equation}\label{eq:probability:of:decision:variable}
-	\mathbb P\{\mathcal V\}\geq p
-\end{equation}
+\label{eq:probability:of:decision:variable}
+	& \mathbb P\{\mathcal V\}\geq p \\
 %
-\begin{equation}\label{eq:nonlinear:inclusion}
-	g(\mathcal V)\subseteq\mathcal Y
-\end{equation}
+\label{eq:nonlinear:inclusion}
+	& g(\mathcal V)\subseteq\mathcal Y
+\end{alignat}
 \end{subequations}
 %
-where~$\epsilon>0$ denotes a tolerance and can be used as a design variable.
+where~$\epsilon>0$ denotes a tolerance, which can be used as a design variable.
 %
-For general problems~\eqref{seq:simplified:problem:description} both~\eqref{eq:probability:of:decision:variable} and~\eqref{eq:nonlinear:inclusion} pose computational challenges.
+For general problems of the form~\eqref{seq:simplified:problem:description}, both~\eqref{eq:probability:of:decision:variable} and~\eqref{eq:nonlinear:inclusion} pose computational challenges.
 %
-In min-max control problems constraints of the type~\eqref{eq:nonlinear:inclusion} arise where~$g(\mathcal V)$ becomes an affine transformation of the set~$\mathcal V$, see e.g.~\cite{Schaich:2017}, i.e.~$g(\mathcal V) = C\mathcal V\oplus \mathcal S$ for some known linear map~$C\in\mathbb R^{d\times d}$ and a known set~$\mathcal S$. 
+Constraints of the type~\eqref{eq:nonlinear:inclusion} arise in min-max control problems, where~$g(\mathcal V)$ becomes an affine transformation of the set~$\mathcal V$ (see e.g.~\cite{Schaich:2017}), i.e.~$g(\mathcal V) = C\mathcal V\oplus \mathcal S$ for some known matrix~$C\in\mathbb R^{q\times d}$ and a known set~$\mathcal S$. 
 %
 Such affine maps can be explicitly inverted using the Pontryagin difference and we therefore omit a general treatment of~\eqref{eq:nonlinear:inclusion}.
 %
 \begin{rem}
-Notice that the constraints introduced in~\eqref{seq:simplified:problem:description} determine a non-convex feasible set. 
+The constraints introduced in~\eqref{seq:simplified:problem:description} generally result in a non-convex feasible set.
 %
-However, the question of convexity of problem~\eqref{seq:main:problem} is ill-posed as the set of measurable sets (on which~\eqref{seq:main:problem} could be sensibly defined) is not a vector space, in fact even the set of convex measurable sets is not a vector space.
+We note, however, that the question of convexity of the general problem~\eqref{seq:main:problem} is ill-posed because the set of measurable sets (on which~\eqref{seq:main:problem} could be sensibly defined) is not a vector space, and in fact even the set of convex measurable sets is not a vector space.
+In particular, $f(\lambda\mathcal V_1\oplus(1-\lambda)\mathcal V_2)\leq\lambda f(\mathcal V_1)+(1-\lambda)f(\mathcal V_2)$ for all $\lambda\in[0,1]$ does NOT imply that there exists a unique optimum~$\mathcal V^\prime$ such that $f(\mathcal V^\prime)\leq f(\mathcal V^\prime\oplus\tilde{\mathcal V})$ for all admissible~$\tilde{\mathcal V}$.
 %
-The property of convexity relies on certain structures of the topology on which it is defined, no useful definition of convexity for problem~\eqref{seq:main:problem} can be made, therefore we cannot expect a simplification such as~\eqref{seq:simplified:problem:description} to be a convex finite dimensional problem.
-\textcolor{red}{I'm not sure if this is a particularly good remark.. I think it is important to say that something like~$f(\lambda\mathcal V_1\oplus(1-\lambda)\mathcal V_2)\leq\lambda f(\mathcal V_1)+(1-\lambda)f(\mathcal V_2)$ does NOT imply that there exists a unique optimum~$\mathcal V^\prime$ such that $f(\mathcal V^\prime)\leq f(\mathcal V^\prime\oplus\tilde{\mathcal V})$ for all admissible~$\tilde{\mathcal V}$.}
+%Since the property of convexity relies on certain structures of the topology on which it is defined, no useful definition of convexity for problem~\eqref{seq:main:problem} can be made, therefore we cannot expect a simplification such as~\eqref{seq:simplified:problem:description} to be a convex finite dimensional problem.
+%\textcolor{red}{I'm not sure if this is a particularly good remark.. I think it is important to say that something like~$f(\lambda\mathcal V_1\oplus(1-\lambda)\mathcal V_2)\leq\lambda f(\mathcal V_1)+(1-\lambda)f(\mathcal V_2)$ does NOT imply that there exists a unique optimum~$\mathcal V^\prime$ such that $f(\mathcal V^\prime)\leq f(\mathcal V^\prime\oplus\tilde{\mathcal V})$ for all admissible~$\tilde{\mathcal V}$.}
 \end{rem}
 %
-\noindent Constraint~\eqref{eq:probability:of:decision:variable} is a constraint on the probability measure of~$\mathcal V$
+\noindent Constraint~\eqref{eq:probability:of:decision:variable} is a constraint on the probability measure of~$\mathcal V$:
 %
 \begin{equation}\label{eq:integral:probability}
-	\mathbb P\{\mathcal V\} = \int_{\mathcal V}\mathfrak f(x)dx
+	\mathbb P\{\mathcal V\} = \int_{\mathcal V}\mathfrak f(x) \; \mathrm d x
 \end{equation}
 %
 where~$\mathfrak f(x)$ denotes the probability density function of the random variable in the problem definition~\eqref{seq:main:problem}.
 %
 In the next section we discuss a method to approximate integrals like~\eqref{eq:integral:probability}.
 
-\section{A finite approximation of the probability measure}\label{sec:counting:cubes}
+\section{Finite approximations of probability measures}\label{sec:counting:cubes}
 %
 %
 %
 %
-\noindent To be able to solve the optimisation program~\eqref{seq:simplified:problem:description} with existing non-linear programming solvers we require a numerically tractable way of evaluating the probabilistic measure of the decision variable~\eqref{eq:probability:of:decision:variable}, i.e. a way of determining the integral~\eqref{eq:integral:probability}.
+\noindent To be able to solve the optimisation program~\eqref{seq:simplified:problem:description} with existing nonlinear programming solvers we require a numerically tractable way of evaluating the probabilistic measure of the decision variable~\eqref{eq:probability:of:decision:variable}, i.e. a way of determining the integral~\eqref{eq:integral:probability}.
 %
-To this end we define the homogeneous grid~$Z$ over $\Omega\subseteq\mathbb R^d$ using the cubes
-%
-\begin{equation}
-	Q_{\bfa{i}} =\left\{x\in\mathbb R^d: \delta i_j \leq x_j\leq\delta (i_j+1)\;\forall j\in\{1,\dots,d\} \right\}
-\end{equation}
-%
-that is the grid is given by
+To this end we define the homogeneous grid~$Z$ over $\Omega\subseteq\mathbb R^d$ using cubes, denoted $Q_{\bfa{i}}$, defined in terms of a multi-index $\bfa{i}=\{i_1,\ldots,i_d\}$ by
 %
 \begin{equation}
-	Z = \bigcup_{\substack{\bfa{i}\in\mathbb Z^d\\ Q_\bfa{i}\cap\Omega\neq\emptyset}} Q_\bfa{i}.
+	Q_{\bfa{i}} =\left\{x\in\mathbb R^d: \delta i_j \leq x_j\leq\delta (i_j+1)\;\forall j\in\{1,\dots,d\} \right\} .
 \end{equation}
 %
-Naturally the grid depends on the choice of~$\delta$, in order to use the grid we furthermore define
+The definition of the grid, which clearly depends on the choice of~$\delta$, is thus
 %
 \begin{equation}
-	\mathfrak f_\bfa{i} = \int_{Q_\bfa{i}}\mathfrak f(x)dx.
+	Z = \bigcup_{\substack{\bfa{i}\in\mathbb Z^d\\ Q_\bfa{i}\cap\Omega\neq\emptyset}} Q_\bfa{i} .
 \end{equation}
 %
-To approximate the integral~\eqref{eq:integral:probability} we introduce the finite sums
+Defining
+%
+\begin{equation}
+	\mathfrak f_\bfa{i} = \int_{Q_\bfa{i}}\mathfrak f(x)\; \mathrm d x ,
+\end{equation}
+%
+we can approximate the integral~\eqref{eq:integral:probability} using the finite sums
 %
 \begin{align}
-\underline{P}(\mathcal V) = \sum_{Q_\bfa{i}\subseteq\mathcal V}\mathfrak f_\bfa{i}\label{eq:inner:approx}\\
-\overline{P}(\mathcal V) = \sum_{Q_\bfa{i}\cap\mathcal V\neq\emptyset}\mathfrak f_\bfa{i} \label{eq:outer:approx}\\
-\mathring{P}(\mathcal V) = \sum_{c_\bfa{i}\in\mathcal V}\mathfrak f_\bfa{i}\label{eq:center:approx}
+\underline{P}(\mathcal V) &= \sum_{Q_\bfa{i}\subseteq\mathcal V}\mathfrak f_\bfa{i}\label{eq:inner:approx}\\
+\overline{P}(\mathcal V) &= \sum_{Q_\bfa{i}\cap\mathcal V\neq\emptyset}\mathfrak f_\bfa{i} \label{eq:outer:approx}\\
+\mathring{P}(\mathcal V) &= \sum_{c_\bfa{i}\in\mathcal V}\mathfrak f_\bfa{i}\label{eq:center:approx}
 \end{align}
 %
 where~$c_\bfa{i}=(\bfa{i}+\frac{1}{2}\bfa{1})\delta$ denotes the centre of the cube~$Q_\bfa{i}$.
@@ -327,46 +335,59 @@ furthermore $\lim_{\delta\searrow0}\underline{P}(\mathcal V)=\mathbb{P}(\mathcal
 \end{thm}
 %
 \begin{proof}
-Identity~\eqref{eq:sandwich:synthetical} follows trivially from the fact that~$c_\bfa{i}\in\mathcal V\Rightarrow Q_\bfa{i}\cap\mathcal V\neq\emptyset$ and~$Q_\bfa{i}\subseteq\mathcal V\Rightarrow c_\bfa{i}\in\mathcal V$.
+Identity~\eqref{eq:sandwich:synthetical} follows trivially from the fact that~$c_\bfa{i}\in\mathcal V$ implies $Q_\bfa{i}\cap\mathcal V\neq\emptyset$ and $Q_\bfa{i}\subseteq\mathcal V$ implies $c_\bfa{i}\in\mathcal V$.
 %
-For identity~\eqref{eq:sandwich:analytical} we use that~$\underline P(\mathcal V)$ and~$\overline{P}(\mathcal V)$ are the exact integrals over an inner and an outer approximation of~$\mathcal V$ in the sense of the Lebesgue measure, therefore both~\eqref{eq:sandwich:analytical} and~$\lim_{\delta\searrow0}\underline{P}(\mathcal V)=\mathbb{P}(\mathcal V)=\lim_{\delta\searrow0}\overline{P}(\mathcal V)$ follow.
+For identity~\eqref{eq:sandwich:analytical} we use the fact that~$\underline P(\mathcal V)$ and~$\overline{P}(\mathcal V)$ are respectively the exact integrals (in the sense of the Lebesgue measure) over inner and outer approximations of~$\mathcal V$, and~\eqref{eq:sandwich:analytical} and~$\lim_{\delta\searrow0}\underline{P}(\mathcal V)=\mathbb{P}(\mathcal V)=\lim_{\delta\searrow0}\overline{P}(\mathcal V)$ therefore follow.
 \end{proof}
 %
 For general polytopes~$\mathcal V\subseteq\mathbb R^d$ evaluating~$\underline{P}(\mathcal V)$ requires checking, for each $Q_{\bfa i} \subseteq Z$, whether the cube $Q_{\bfa i}$ is a subset of $\mathcal{V}$, where the number of multi-indices~$\bfa{i}\in\mathbb Z^d$ with~$Q_\bfa{i}\cap\mathcal V\neq\emptyset$ can be overestimated by~$D_1D_2\dots D_d \delta^{-d}$.
 %
 Where $D_i = \{\min_{\overline{x_i},\underline{x_i}} \overline{x_i}-\underline{x_i} : \underline{x_i}\leq x_i\leq\overline{x_i}\; \forall x\in\Omega\}$.
 %
-Checking whether~$Q_\bfa{i}\subseteq\mathcal V$ requires the solution of a linear program with~$2dM$ decision variables, see e.g.~\cite{Schaich:thesis}, for larger numbers of multi-indices the computation becomes intractable.
+Checking whether~$Q_\bfa{i}\subseteq\mathcal V$ requires the solution of a linear program with~$2dM$ decision variables (see e.g.~\cite{Schaich:thesis}), and for larger numbers of multi-indices the computation therefore becomes intractable.
 %
 Similarly, checking whether~$\mathcal V\cap Q_\bfa{i}\neq\emptyset$ requires the solution of a linear program with~$d$ decision variables, again becoming intractable for large grids.
 %
-Recall that non-linear programming solvers would not compute~$\underline{P}(\mathcal V)$ and~$\overline{P}(\mathcal V)$ once but repeatedly throughout the optimisation.
+Recall that nonlinear programming solvers would not compute~$\underline{P}(\mathcal V)$ and~$\overline{P}(\mathcal V)$ once but repeatedly throughout the optimisation.
 %
-\\[1em]
+
+
 %
-Although the relation between~$\mathbb P\{\mathcal V\}$ and~$\mathring{P}(\mathcal V)$ is not known, due to Lemma~\ref{thm:sandwich:inequality} we have~$\abs{\mathbb P\{\mathcal V\}-\mathring{P}(\mathcal V)}\leq \overline{P}(\mathcal V)-\underline{P}(\mathcal V)$ and therefore~$\mathring{P}(\mathcal V)\xrightarrow{\delta\searrow0}\mathbb{P}(\mathcal V)$.
+Although the relation between~$\mathbb P\{\mathcal V\}$ and~$\mathring{P}(\mathcal V)$ is not known, from Lemma~\ref{thm:sandwich:inequality} we have~$\lvert\mathbb P\{\mathcal V\}-\mathring{P}(\mathcal V)\rvert \leq \overline{P}(\mathcal V)-\underline{P}(\mathcal V)$, and therefore
+\[
+\mathring{P}(\mathcal V)\xrightarrow{\delta\searrow0}\mathbb{P}(\mathcal V).
+\]
 %
-Determining whether a point is contained in a polytope~$c_\bfa{i}\in\mathcal V$ does not require linear programming methods but simply that $a_k c_\bfa{i}\leq b_k$ holds for all~$k\in\{1,\dots,M\}$.
+Determining whether a point $c_\bfa{i}$ is contained in a polytope~$\mathcal V$ does not require linear programming methods but simply that $a_k c_\bfa{i}\leq b_k$ holds for all~$k\in\{1,\dots,M\}$.
 %
-To do this efficiently let~$\sigma(t)=\{1$ if~$t\geq0, 0$ if~$t<0\}$ denote the Heaviside function and let~$\gamma(t) = \sigma(-t)$, furthermore let
+To do this efficiently let
+\[
+\sigma(t)=\begin{cases} 1, & t\geq0 \\
+0, & t<0
+\end{cases}
+\]
+denote the Heaviside function and let~$\gamma(t) = \sigma(-t)$, furthermore let
 %
 \begin{equation}
 	g_\bfa{i} = \sum_{k=1}^M\gamma(a_k c_\bfa{i}-b_k).
 \end{equation}
 %
-Clearly, $c_\bfa{i}\in\mathcal V$ is equivalent to~$g_\bfa{i}=M$, or~$g_\bfa{i}-M+\rho\geq0$ for any~$0\leq\rho$, with this we have the explicit formula
+Clearly, $c_\bfa{i}\in\mathcal V$ is equivalent to~$g_\bfa{i}=M$, or~$g_\bfa{i}-M+\rho\geq0$ for any~$0\leq\rho$, and with this we have the explicit formula
 %
 \begin{equation}\label{eq:exact:formula:mathring}
 	\mathring{P}(\mathcal V) = \sum_{\bfa{i}}\sigma(g_\bfa{i}-M+\rho)\mathfrak f_\bfa{i}.
 \end{equation}
 %
-Since the discontinuity of the Heaviside function~$\sigma(t)$ can cause problems for non-linear programming solvers, we therefore relax~\eqref{eq:exact:formula:mathring} using a smooth approximation.
+Since the discontinuity of the Heaviside function~$\sigma(t)$ can cause problems for nonlinear programming solvers, we therefore relax~\eqref{eq:exact:formula:mathring} using a smooth approximation.
 %
-\\[1em]
+
+
 %
-To approximate the Heaviside function~$\sigma(t)$ and hence~\eqref{eq:exact:formula:mathring} smoothly we propose the use of the logistic Sigmoid function~$S(\alpha,t) = (1-e^{-\alpha t})^{-1}$, the logistic function has various properties that make it favourable for our purposes.
+To construct a smooth approximation of the Heaviside function~$\sigma(t)$,
+%and hence~\eqref{eq:exact:formula:mathring} smoothly 
+we propose the use of the logistic Sigmoid function~$S(\alpha,t) = (1-e^{-\alpha t})^{-1}$, which has various properties that make it favourable for our purposes.
 %
-In particular the derivative property~$\frac{dS}{dt}(\alpha,t)=S(\alpha,t)(1-S(\alpha,t))\alpha$ allows us to obtain the derivative of the approximation
+In particular the derivative property~$\frac{\mathrm d S}{\mathrm d t}(\alpha,t)=S(\alpha,t)(1-S(\alpha,t))\alpha$ allows us to obtain the derivative of the approximation
 %
 \begin{equation}\label{eq:central:approximation:formula}
 \begin{aligned}
@@ -379,19 +400,19 @@ with a minimal number of function evaluations, where~$\tilde\rho>0$ is an approp
 %
 It is worth pointing out that the logistic function converges point-wise towards the Heaviside function~$\abs{S(\alpha,t)-\sigma(t)}\xrightarrow{\alpha\rightarrow\infty}0$ for all~$t\in\mathbb R\setminus\{0\}$ and~$S(\alpha,0)=\frac{1}{2}$ for all~$\alpha\in\mathbb R$.
 %
-This allows us to specify criteria to design appropriate~$\rho>0$, for this let~$\Delta(\alpha,\eta)=t_2-t_1$ denote the length of the interval such that~$S(\alpha,t_1)=\eta$ and~$S(\alpha,t_2)=1-\eta$ for~$0<\eta<1$.
+This allows us to specify criteria to design appropriate~$\rho>0$; for this let~$\Delta(\alpha,\eta)=t_2-t_1$ denote the length of the interval such that~$S(\alpha,t_1)=\eta$ and~$S(\alpha,t_2)=1-\eta$ for~$0<\eta<1$.
 %
-Using simple arithmetic we find~$\Delta(\alpha,\eta)=\frac{2}{\alpha}(\log(1-\eta)-\log(\eta))$, in order to choose~$\rho$ and~$\alpha$ so as to suppress ambiguities between~$c_\bfa{i}$ and its neighbours~$c_\bfa{j}$, a sensible choice would be to choose such that~$\Delta(\alpha,\eta)<\delta$, i.e. smaller than the minimal distance between two centre points~$c_\bfa{i}$ and~$c_\bfa{j}$. 
+Using simple arithmetic we find~$\Delta(\alpha,\eta)=\frac{2}{\alpha}(\log(1-\eta)-\log(\eta))$. In order to choose~$\rho$ and~$\alpha$ so as to suppress ambiguities between~$c_\bfa{i}$ and its neighbours~$c_\bfa{j}$, a sensible choice would be to make~$\Delta(\alpha,\eta)<\delta$, so that $\Delta(\alpha,\eta)$ is smaller than the minimal distance between two centre points~$c_\bfa{i}$ and~$c_\bfa{j}$. 
 %
 The canonical choice for~$\tilde\rho$ is therefore given by~$\tilde\rho=\frac{\Delta(\alpha,\eta)}{2}$ which produces~$S(\alpha,\tilde\rho)=1-\eta$.
 %
-Assume~$c_\bfa{i}$ to be a vertex of~$\mathcal V$, i.e.~$\tilde g_\bfa{i}>(1-\eta)d+(1-\eta)(M-d)$ where the first term is exact and the~$(1-\eta)(M-d)$ term can be assumed to be approximately~$M-d$.
+Assume~$c_\bfa{i}$ to be a vertex of~$\mathcal V$, i.e.~$\tilde g_\bfa{i}>(1-\eta)d+(1-\eta)(M-d)$ where the first term is exact and the~$(1-\eta)(M-d)$ term can be bounded approximately as~$M-d$.
 %
 In particular, notice that it is not possible for a point~$c_\bfa{i}\in\mathcal V$ to have a value~$g_\bfa{i}=(1-\delta)M$ since this implies that $c_\bfa{i}$ lies on all~$M>d$ hyperplanes.
 %
-Therefore, $f_\bfa{i}$ contributes to~$\tilde{P}(\mathcal V)$ if~$\tilde g_\bfa{i}\geq(1-\eta)d+(M-d)-\rho$ where rho can be chosen similar to~$\tilde\rho$.
+Therefore, $f_\bfa{i}$ contributes to~$\tilde{P}(\mathcal V)$ if~$\tilde g_\bfa{i}\geq(1-\eta)d+(M-d)-\rho$ where rho can be chosen similarly to~$\tilde\rho$.
 %
-The way we chose~$\rho$ and~$\tilde\rho$ yields
+These choices for~$\rho$ and~$\tilde\rho$ yield
 %
 \begin{equation}\label{eq:sandwich:from:sigmoid}
 	\tilde P(\mathcal V)\leq\mathring P(\mathcal V)\leq \frac{\tilde P(\mathcal V)}{1-\eta}.
@@ -399,7 +420,7 @@ The way we chose~$\rho$ and~$\tilde\rho$ yields
 %
 The left hand side of~\eqref{eq:sandwich:from:sigmoid} follows from the way we chose~$\rho$ and~$\tilde\rho$ to have~$S(\alpha,t+\rho)<\sigma(t)$ for all~$t\geq0$ and~$S(\alpha,t+\rho)\leq\eta$ for all~$t\leq -\Delta(\alpha,\eta)$, leaving only the interval~$[-\Delta(\alpha,\eta),0]$ for aliasing.
 %
-However, since we concatenate the two Sigmoid functions we get that the~$\tilde g_\bfa{i}>M-1$ contribute to~$\tilde P(\mathcal V)$ and this strict inequality can not be satisfied unless~$c_\bfa{i}\in\mathcal V$ is in all~$M$ halfspaces, i.e. the interval~$[-\Delta(\alpha,\eta),0]$ does not contribute to the result as long as~$\Delta(\alpha,\eta)<1$ which can easily be satisfied by increasing~$\alpha>0$.
+However, since we concatenate the two Sigmoid functions we get that the~$\tilde g_\bfa{i}>M-1$ contribute to~$\tilde P(\mathcal V)$ and this strict inequality cannot be satisfied unless~$c_\bfa{i}\in\mathcal V$ is in all~$M$ halfspaces, i.e.~the interval~$[-\Delta(\alpha,\eta),0]$ does not contribute to the result as long as~$\Delta(\alpha,\eta)<1$, which can easily be satisfied by increasing~$\alpha>0$.
 %
 We illustrate the proposed method in a numerical example in the following section.
 
@@ -408,39 +429,50 @@ We illustrate the proposed method in a numerical example in the following sectio
 %
 \noindent In order to illustrate the proposed method we use an example motivated by a robust model predictive control approach to a stochastic problem formulation.
 %
-Consider the problem of finding the largest set of states~$\mathcal X$ for the system~$x^+=x+v$, such that~$\mathbb P\{x^+\in\mathcal Y\}\geq \frac{3}{10}$ holds for the set~$\mathcal Y = \{y\in\mathbb R^2:-5\leq y_i\leq 4\}$, where the random variable~$v\in\Omega=\{\omega\in\mathbb R^2:\abs{\omega_i}\leq2\}$ has the known probability density function~$\mathfrak f(v)$.
+Consider the problem of finding the largest set of states~$\mathcal X$ for the system~$x^+=x+v$ (where $x^+$ denotes the successor state) such that
+\[
+\mathbb P\{x^+\in\mathcal Y\}\geq \frac{3}{10}
+\]
+holds for~$\mathcal Y = \{y\in\mathbb R^2:-5\leq y_i\leq 4\}$, where the random variable~$v\in\Omega=\{\omega\in\mathbb R^2:\abs{\omega_i}\leq2\}$ has the known probability density function~$\mathfrak f(v)$.
 %
-The density~$\mathfrak f(v)$ we consider is a truncated normal distribution~$\mathfrak f(v) = \frac{1}{c}\exp(-v_1^2-2v_2^2)$, with $c=\frac{\pi\text{erf}(2)\text{erf}(2\sqrt{2})}{\sqrt 2}$ such that~$\mathbb P\{\Omega\}=1$.
+The density~$\mathfrak f(v)$ we consider is a truncated normal distribution:
+\[
+\mathfrak f(v) = \frac{1}{c}\exp(-v_1^2-2v_2^2)
+\quad \text{with} \quad
+c=\frac{\pi\,\text{erf}(2)\,\text{erf}(2\sqrt{2})}{\sqrt 2}
+\]
+so that~$\mathbb P\{\Omega\}=1$.
 %
-Naturally this problem can be rewritten as
+Naturally this problem can be formulated as
 %
 \begin{subequations}\label{seq:example:original}
 \begin{equation}
-	\max_{\mathcal V} \text{vol}(\mathcal X)
+	\maximize_{\mathcal V \subseteq\Omega} \ \text{vol}(\mathcal X)
 \end{equation}
 subject to
-\begin{equation}
-	\mathbb P\{\mathcal V\}\geq \frac{1}{3}
-\end{equation}
-\begin{equation}
-	\mathcal V\subseteq\Omega
-\end{equation}
-\begin{equation}
-	\mathcal X = \mathcal Y\ominus \mathcal V
-\end{equation}
+\begin{align}
+	&\mathbb P\{\mathcal V\}\geq \frac{1}{3} \\
+%\end{equation}
+% \begin{equation}
+% 	\mathcal V\subseteq\Omega
+% \end{equation}
+%\begin{equation}
+	&\mathcal X = \mathcal Y\ominus \mathcal V
+\end{align}
 \end{subequations}
 %
-where the Pontryagin difference~$\tilde{\mathcal X}$ guarantees the satisfaction of~$x^+\in\mathcal Y$ for all~$v\in\mathcal V$.
+where the Pontryagin difference in (\ref{seq:example:original}c) guarantees satisfaction of~$x^+\in\mathcal Y$ for all~$v\in\mathcal V$.
 %
-To be able to apply the method described above we have to choose an initialising polytope~$\mathcal V_0$ which defines the combinatorial structure of~$\mathcal V$, for this we use 
+To be able to apply the proposed method we have to choose an initialising polytope~$\mathcal V_0$ which defines the combinatorial structure of~$\mathcal V$, for this we use 
 %
 \[
 \mathcal V_0 = \conv\left\{\begin{pmatrix}\pm 1\\0 \end{pmatrix},\begin{pmatrix}0\\\pm1\end{pmatrix},\begin{pmatrix}\pm\frac{3}{4}\\\pm\frac{3}{4}\end{pmatrix}\right\}
 \]
 %
-and the index sets~$\mathcal A_i$ are given as~$\mathcal A_i=\{i,i+1\}$ for $i\in\{1,\dots,5\}$ and~$\mathcal A_6=\{1,6\}$ (the numeric values depend to the half-space description used but may be rearranged).
+and the index sets~$\mathcal A_i$ are given as~$\mathcal A_i=\{i,i+1\}$ for $i\in\{1,\dots,5\}$ and~$\mathcal A_6=\{1,6\}$ (the numeric values depend on the half-space description employed but may be rearranged).
 %
-\\[1em]
+
+
 %
 Before we can rewrite~\eqref{seq:example:original} using~$\mathring P(\mathcal V)$ we first have to choose a grid and evaluate~$\mathfrak f_\bfa{i}$.
 %
@@ -448,13 +480,26 @@ We choose~$\delta=\frac{1}{100}$, this yields a total of~$4^2 100^2=160000$ cube
 %
 To deal with large numbers of double integrals over cubes~$Q_\bfa{i}$ efficiently we propose the following method:
 %
-Firstly notice that~$\mathfrak f_\bfa{i}=\int_{Q_\bfa{i}}\mathfrak f(v)dv = \int_{\delta i_1}^{\delta(i_1+1)}\int_{\delta i_2}^{\delta(i_2+1)}\mathfrak f(v_1,v_2)dv_2dv_1 = \int_0^\delta\int_0^\delta \mathfrak f(v_1+\delta i_1,v_2+\delta i_2)dv_2dv_1$, with this we can evaluate the inner integral for all relevant~$\bfa{i}$ at once by introducing
+Firstly notice that
+\begin{align*}
+\mathfrak f_\bfa{i}=\int_{Q_\bfa{i}}\mathfrak f(v) \; \mathrm d v = &\int_{\delta i_1}^{\delta(i_1+1)}\int_{\delta i_2}^{\delta(i_2+1)}\mathfrak f(v_1,v_2) \; \mathrm d v_2 \; \mathrm d v_1 \\
+= &\int_0^\delta\int_0^\delta \mathfrak f(v_1+\delta i_1,v_2+\delta i_2) \; \mathrm d v_2 \; \mathrm d v_1
+\end{align*}
+and with this we can evaluate the inner integral for all relevant~$\bfa{i}$ at once by introducing
 %
+\begin{multline*}
+\mathfrak F(v_1) =
+\int\limits_0^\delta 
+\bigl[ 
+\mathfrak f(v_1-200\delta,v_2-200\delta) , \ldots , \\
+%\mathfrak f(v_1-200\delta,v_2-199\delta),\dots, \\
+\mathfrak f(v_1+199\delta,v_2+199\delta) \bigr] \; \mathrm d v_2 .
+\end{multline*}
+%
+The values for all $\mathfrak f_{-200,-200}$ to~$\mathfrak f_{199,199}$ are then obtained by integrating with respect to~$v_1$, i.e. 
 \[
-\Resize{\mathfrak F(v_1) = \int\limits_0^\delta (\mathfrak f(v_1-200\delta,v_2-200\delta), \mathfrak f(v_1-200\delta,v_2-199\delta),\dots)^T dv_2}.
+\bigl[ \mathfrak f_{-200,-200}, \mathfrak f_{-200,-199},\dots,\mathfrak f_{199,199} \bigr] =\int_0^\delta\mathfrak F(v_1) \; \mathrm d v_1.
 \]
-%
-The values for all $\mathfrak f_{-200,-200}$ to~$\mathfrak f_{199,199}$ are then obtained by integrating with respect to~$v_1$, i.e. $(\mathfrak f_{-200,-200},\dots,\mathfrak f_{199,199})^T=\int_0^\delta\mathfrak F(v_1)dv_1$.
 %
 This approach can save a significant amount of time in comparison to evaluating each double integral individually and can easily be extended to higher dimensions.
 %
@@ -462,11 +507,16 @@ Next we choose the threshold~$\eta=\frac{1}{10}$, i.e.~$\mathfrak f_\bfa{i}$ con
 %
 To avoid aliasing we choose~$\alpha=5000$, this yields~$\Delta(5000,10^{-1}) = \frac{2\log9}{5000}\approx0.0008789<\delta$,
 %
-\\[1em]
+
+
 %
 In order to compare the suggested method we use a scenario-based approach similar to the one described in~\cite{Margellos:2014}.
 %
-For this we draw a sufficient number of samples~$\{v_1,\dots,v_n\}\subseteq\Omega$ of the random variable, where the number~$n$ is chosen to satisfy~$\Phi(1-p,d,n) = \sum_{k=0}^{d}\binom{n}{k}(1-p)^kp^{n-k}<\beta$ for a confidence~$\beta>0$, see e.g.~\cite{Calafiore:2010}, which we choose as~$\beta=\frac{1}{1000}$.
+For this we draw a sufficient number of samples~$\{v_1,\dots,v_n\}\subseteq\Omega$ of the random variable, where the number~$n$ is chosen to satisfy
+\[
+\Phi(1-p,d,n) = \sum_{k=0}^{d}\binom{n}{k}(1-p)^kp^{n-k}<\beta
+\]
+for a confidence~$\beta>0$, see e.g.~\cite{Calafiore:2010}, which we choose as~$\beta=\frac{1}{1000}$.
 %
 The necessary number~$n$ can be upper bounded by the smallest integer satisfying~$\tilde n>\frac{2}{1-p}(d-\log(\beta))$, however for this example we can explicitly evaluate~$\Phi(\frac{7}{10},2,n)$ to find $\Phi(\frac{7}{10},2,\{10,11\}) = \{0.00159039,0.000577696\}$, i.e. eleven samples are required for scenario based statements to hold with confidence larger then~$1-\beta=\frac{999}{1000}$.
 %
@@ -478,11 +528,12 @@ To allow a better comparison we draw $500$~samples and pick~$11$ points at rando
 %
 The resulting sets are illustrated in Figure~\ref{fig:example:in:comparison}, and we refer to Table~\ref{tab:only:table} for numerical values, notice that we can evaluate both~$\underline{P}(\mathcal V)$ and~$\overline{P}(\mathcal V)$ for a given set~$\mathcal V$, this takes~$174$ and~$143$ seconds respectively in comparison to the evaluation of~$\mathring{P}(\mathcal V)$ which takes~$0.0864$ seconds (where all computations are implemented in Matlab and timed on a 2.3 GHz MacBook Pro, all linear programs are solved using Gurobi~7).
 %
-Due to issues related to the non-linear programming solver, the objective function used to obtain the result shown in Figure~\ref{fig:example:in:comparison} is~$\log(1+\text{vol}(\mathcal X))$ rather than~$\text{vol}(\mathcal X)$.
+Due to issues related to the nonlinear programming solver, the objective function used to obtain the result shown in Figure~\ref{fig:example:in:comparison} is~$\log(1+\text{vol}(\mathcal X))$ rather than~$\text{vol}(\mathcal X)$.
 %
-\\[1em]
+
+
 %
-Notice that the bound~$e(\mathcal V) = \abs{\mathbb P\{\mathcal V\}-\mathring{P}(\mathcal V)}$ depends on the measure on the cubes which intersect the boundary of~$\mathcal V$, this means that for non-uniform distributions the error~$e(\mathcal V)$ decreases with the distance from the expected value.
+Notice that the bound~$e(\mathcal V) = \lvert\mathbb P\{\mathcal V\}-\mathring{P}(\mathcal V)\rvert$ depends on the measure on the cubes which intersect the boundary of~$\mathcal V$, this means that for non-uniform distributions the error~$e(\mathcal V)$ decreases with the distance from the expected value.
 %
 This implies that a non-uniform grid size such that for each $Q_\bfa{i}$ the measure~$0<\mathfrak{f}_\bfa{i}<\epsilon$ for some fixed~$\epsilon$ may be used to reduce the number of necessary cubes as well as the dependence of the error~$e(\mathcal V)$ on the inner radius of~$\mathcal V$.
 
@@ -508,9 +559,17 @@ We consider a compact probability space~$\Omega\subseteq\mathcal B$ for some box
 %
 The algorithm we suggest is to define a polytopal complex~$\mathcal C$ consisting of cubes~$Q_i$ such that~$\bigcup_{Q_i\in\mathcal C}Q_i=\mathcal B$ and the associated probability measure of each cube is below a certain threshold~$\mathfrak{f}_i\leq\mathfrak{f}_{\max}$.
 %
-To do this efficiently first notice that~$\int_0^{\delta}\dots\int_0^\delta f(t_1,\dots,t_d)dt_1\dots dt_d = \delta^d\int_0^1\dots\int_0^1f(\delta\tau_1,\dots,\delta\tau_d)d\tau_1\dots d\tau_d$, while this is a trivial substitution it allows the simultaneous computation of~$\mathfrak{f}_i$ over differently sized cubes~$Q_i$.
+To do this efficiently first notice that
+\begin{multline*}
+\int_0^{\delta}\dots\int_0^\delta f(t_1,\dots,t_d)\; \mathrm d t_1\dots \mathrm dt _d = \\ \delta^d\int_0^1\dots\int_0^1f(\delta\tau_1,\dots,\delta\tau_d)
+\; \mathrm d\tau_1\dots \mathrm d\tau_d, 
+\end{multline*}
+while this is a trivial substitution it allows the simultaneous computation of~$\mathfrak{f}_i$ over differently sized cubes~$Q_i$.
 %
-Let~$\{q_1,\dots,q_{2^d}\}$ denote the vertices of the cube~$\mathcal Q=\{x\in\mathbb R^d: 0\leq x_i\leq 1\}$, for this algorithm it is more convenient to characterise cubes by their \emph{lower left corner}~$b_i$ and their side length~$\delta_i$, i.e. the $i$-th cube is given by~$Q_i=\conv_{1\leq k\leq2^d}\{b_i+\delta_i q_k\}$, the associated measure is given by~$\mathfrak{f}_i=\int_{\mathcal Q}\mathfrak{f}(b_i+\delta_i\bfa{1} t)dt$.
+Let~$\{q_1,\dots,q_{2^d}\}$ denote the vertices of the cube~$\mathcal Q=\{x\in\mathbb R^d: 0\leq x_i\leq 1\}$, for this algorithm it is more convenient to characterise cubes by their \emph{lower left corner}~$b_i$ and their side length~$\delta_i$, i.e. the $i$-th cube is given by~$Q_i=\conv_{1\leq k\leq2^d}\{b_i+\delta_i q_k\}$, the associated measure is given by
+\[
+\mathfrak{f}_i=\int_{\mathcal Q}\mathfrak{f}(b_i+\delta_i\bfa{1} t) \; \mathrm d t.
+\]
 %
 We propose the following algorithm to determine~$\mathcal C$:
 %
@@ -529,7 +588,8 @@ The Algorithm~\ref{algo:non:homo:cubes} terminates once either every cube contai
 %
 Once the grid is found the centre points are given by~$c_i=b_i+\frac{\delta_i}{2}\bfa{1}$.
 %
-\\[1em]
+
+
 %
 Algorithm~\ref{algo:non:homo:cubes} can reduce the computational overhead significantly:
 %
@@ -539,7 +599,8 @@ We illustrate a slightly less fine grid in Figure~\ref{fig:inhomogeneous:grid}.
 %
 Since~\eqref{eq:central:approximation:formula} does not depend on the choice of the grid itself the remaining optimisation is unchanged, a single evaluation of~$\mathring{P}(\mathcal V)$ now takes~$0.025115$, i.e. about five times  faster than the homogeneous counterpart, the resulting set~$\mathcal V$ is shown in \textcolor{blue}{blue} in Figure~\ref{fig:example:in:comparison}.
 %
-\\[1em]
+
+
 %
 We summarise the numerical values of the proposed schemes in Table~\ref{tab:only:table}.
 %
@@ -601,9 +662,10 @@ An inhomogeneous grid can be determined iteratively and will generally produce a
 %
 For both methods the synthesis works identically and produced superior results over a conventional scenario-based approach in our example.
 %
-\\[1em]
+
+
 %
-Similar to many other polytope-based methods the proposed scheme does not scale well with dimension, this is due to the fact that the combinatorial structure itself becomes complex with rising dimension, higher dimensional problems will yield a large number of decision variables and non-linear constraints.
+Similar to many other polytope-based methods the proposed scheme does not scale well with dimension, this is due to the fact that the combinatorial structure itself becomes complex with rising dimension, higher dimensional problems will yield a large number of decision variables and nonlinear constraints.
 %
 Furthermore, the number of cubes~$Q_\bfa{i}/Q_i$ which have to be evaluated during the optimisation becomes prohibitively large with increasing dimension for either homogeneous and inhomogeneous grids.
 %

@@ -525,7 +525,7 @@ Notice that for higher dimensional random variables~$\Phi(1-p,d,n)$ cannot be nu
 %
 In order to obtain a set from the~$n$ samples we use the convex hull~$\hat{\mathcal V}=\conv\{v_i\}$ to compare with the result of the optimisation~\eqref{seq:example:original}.
 %
-To allow a better comparison we draw $500$~samples and pick~$11$ points at random to compute a convex hull for the comparison.
+To allow a better comparison we draw $500$~samples and pick~$100$ collections of~$11$ points at random to compute convex hulls for the comparison.
 %
 The resulting sets are illustrated in Figure~\ref{fig:example:in:comparison}, and we refer to Table~\ref{tab:only:table} for numerical values, notice that we can evaluate both~$\underline{P}(\mathcal V)$ and~$\overline{P}(\mathcal V)$ for a given set~$\mathcal V$, this takes~$174$ and~$143$ seconds respectively in comparison to the evaluation of~$\mathring{P}(\mathcal V)$ which takes~$0.0864$ seconds (where all computations are implemented in Matlab and timed on a 2.3 GHz MacBook Pro, all linear programs are solved using Gurobi~7).
 %
@@ -554,7 +554,7 @@ The result for the non-homogeneous grid discussed in Section~\ref{sec:improved:g
 %
 \noindent In the previous section we presented a simple example using a homogeneous grid, this led to a large number of cubes~$Q_\bfa{i}$ and hence centre points~$c_\bfa{i}$.
 %
-Notice that the central approximation~\eqref{eq:central:approximation:formula} does not require a homogeneous grid nor does Lemma~\ref{thm:sandwich:inequality}, we therefore present a method to determine a grid which reflects the properties probability density function more closely.
+Notice that the central approximation~\eqref{eq:central:approximation:formula} does not require a homogeneous grid nor does Lemma~\ref{thm:sandwich:inequality}, we therefore present a method to determine a grid which reflects the properties of the probability density function more closely.
 %
 We consider a compact probability space~$\Omega\subseteq\mathcal B$ for some box~$\mathcal B=\{x\in\mathbb R^d:-\mathfrak{c}\leq x_i\leq \mathfrak{c}\}$.
 %
@@ -596,11 +596,9 @@ Algorithm~\ref{algo:non:homo:cubes} can reduce the computational overhead signif
 %
 For the same example as in Section~\ref{sec:example} with a non-homogeneous grid satisfying~$\mathfrak{f}_i\leq\frac{1}{20000}$ which yields~$\min_i\{\delta_i\}=\frac{1}{2^7}=0.0078125$,~$\max_i\{\delta_i\}=\frac{1}{2}$ and a total of~$45436$ cubes.
 %
-We illustrate a slightly less fine grid in Figure~\ref{fig:inhomogeneous:grid}.
-%
 Since~\eqref{eq:central:approximation:formula} does not depend on the choice of the grid itself the remaining optimisation is unchanged, a single evaluation of~$\mathring{P}(\mathcal V)$ now takes~$0.025115$, i.e. about five times  faster than the homogeneous counterpart, the resulting set~$\mathcal V$ is shown in \textcolor{blue}{blue} in Figure~\ref{fig:example:in:comparison}.
 %
-
+We illustrate a slightly less fine grid in Figure~\ref{fig:inhomogeneous:grid}.
 
 %
 We summarise the numerical values of the proposed schemes in Table~\ref{tab:only:table}.

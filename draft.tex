@@ -16,6 +16,7 @@
 \usepackage{mathrsfs}
 \usepackage{todonotes}
 \usepackage[hidelinks]{hyperref}
+\usepackage{caption}
 
 \usepackage{tikz}
 \usetikzlibrary{arrows,positioning,patterns,decorations.pathreplacing,calc,shapes.geometric}
@@ -176,20 +177,22 @@ We consider an optimisation problem in which the decision variable is a subset o
 subject to
 \begin{align}
 \label{eq:probabilistic:constraint:set:formulation}
-        & \Pr \{ v : v\in\mathcal V \} \geq p \\
+        & \Pr (v\in\mathcal V) \geq p \\
 \label{eq:inclusion:constraint:set:formulation}
         & g(v)\in\mathcal Y \text{ for all } v \in \mathcal V.
 \end{align}
 \end{subequations}
 %
-Here $f: \mathscr P (\Omega) \to \mathbb R_+$, $g:\mathbb R^d\rightarrow \mathbb R^q$, $\mathcal Y\subset\mathbb R^q$ is a given set, and $p\in (0,1]$ is a specified probability.
+Here $f: \mathscr P (\Omega) \to \mathbb R_+$, $g:\mathbb R^d\rightarrow \mathbb R^q$, $\mathcal Y\subset\mathbb R^q$ is a given set, $\Pr(\cdot)$ denotes the probability of event $(\cdot)$  and $p\in (0,1]$ is a specified probability.
 %
 For clarity we can think of~$f$ as the volume (or more generally the measure) of a set that depends on $\mathcal V$ (see for example Section~\ref{sec:example}, where $f(\mathcal V) = \text{vol}(\mathcal X\ominus\mathcal V)$ for a
 given set~$\mathcal X$).
 %where $\ominus$ denotes the Pontryagin set difference, i.e.~$\mathcal X\ominus \mathcal V = \{x: x + v \in \mathcal X \text{ for all } v\in\mathcal V\}$.
 %
 
-The probability space in~\eqref{eq:probabilistic:constraint:set:formulation} (for which we assume the density function is known) is~$(\mathscr P(\Omega), \mathscr F,\mathbb P)$. Hence the constraints~\eqref{eq:probabilistic:constraint:set:formulation} and \eqref{eq:inclusion:constraint:set:formulation}
+The relevant probability space in~\eqref{eq:probabilistic:constraint:set:formulation} (for which we assume the density function is known) is~$(\Omega, \mathscr P(\Omega), \mathbb P)$.
+%, and we assume that the density function is known
+Hence the constraints~\eqref{eq:probabilistic:constraint:set:formulation} and \eqref{eq:inclusion:constraint:set:formulation}
  are equivalent to
 %
 \begin{subequations}
@@ -205,7 +208,7 @@ The probability space in~\eqref{eq:probabilistic:constraint:set:formulation} (fo
 %
 A key problem is therefore to determine the probability measure of the set variable~$\mathcal V$.
 %
-In this work we consider problems of the form~\eqref{seq:main:problem} in which the decision variable~$\mathcal V$ is constrained to be polytopic. In particular we impose the constraint that $\mathcal V$ has a specific \emph{combinatorial structure}, i.e.~$\mathcal V\cong\mathcal V_0$ for a given set $\mathcal V_0$.
+In this work we consider problems of the form~\eqref{seq:main:problem} in which the decision variable~$\mathcal V$ is constrained to be polytopic. In particular we impose the constraint that the auxiliary set $\mathcal V$ has a specific \emph{combinatorial structure}, i.e.~$\mathcal V\cong\mathcal V_0$ for a given set $\mathcal V_0$.
 %
 
 The focus of the remainder of this paper is on constructing a method of approximating the solution of~\eqref{seq:main:problem} using conventional nonlinear programming methods.
@@ -411,7 +414,7 @@ Assume~$c_\bfa{i}$ to be a vertex of~$\mathcal V$, i.e.~$\tilde g_\bfa{i}>(1-\et
 %
 In particular, notice that it is not possible for a point~$c_\bfa{i}\in\mathcal V$ to have a value~$g_\bfa{i}=(1-\delta)M$ since this implies that $c_\bfa{i}$ lies on all~$M>d$ hyperplanes.
 %
-Therefore, $f_\bfa{i}$ contributes to~$\tilde{P}(\mathcal V)$ if~$\tilde g_\bfa{i}\geq(1-\eta)d+(M-d)-\rho$ where rho can be chosen similarly to~$\tilde\rho$.
+Therefore, $f_\bfa{i}$ contributes to~$\tilde{P}(\mathcal V)$ if~$\tilde g_\bfa{i}\geq(1-\eta)d+(M-d)-\rho$ where $\rho$ can be chosen similarly to~$\tilde\rho$.
 %
 These choices for~$\rho$ and~$\tilde\rho$ yield
 %
@@ -419,9 +422,9 @@ These choices for~$\rho$ and~$\tilde\rho$ yield
 	\tilde P(\mathcal V)\leq\mathring P(\mathcal V)\leq \frac{\tilde P(\mathcal V)}{1-\eta}.
 \end{equation}
 %
-The left hand side of~\eqref{eq:sandwich:from:sigmoid} follows from the way we chose~$\rho$ and~$\tilde\rho$ to have~$S(\alpha,t+\rho)<\sigma(t)$ for all~$t\geq0$ and~$S(\alpha,t+\rho)\leq\eta$ for all~$t\leq -\Delta(\alpha,\eta)$, leaving only the interval~$[-\Delta(\alpha,\eta),0]$ for aliasing.
+The left hand side of~\eqref{eq:sandwich:from:sigmoid} follows from the way that~$\rho$ and~$\tilde\rho$ were chosen to ensure that~$S(\alpha,t+\rho)<\sigma(t)$ for all~$t\geq0$ and~$S(\alpha,t+\rho)\leq\eta$ for all~$t\leq -\Delta(\alpha,\eta)$, leaving only the interval~$[-\Delta(\alpha,\eta),0]$ for aliasing.
 %
-However, since we concatenate the two Sigmoid functions we get that the~$\tilde g_\bfa{i}>M-1$ contribute to~$\tilde P(\mathcal V)$ and this strict inequality cannot be satisfied unless~$c_\bfa{i}\in\mathcal V$ is in all~$M$ halfspaces, i.e.~the interval~$[-\Delta(\alpha,\eta),0]$ does not contribute to the result as long as~$\Delta(\alpha,\eta)<1$, which can easily be satisfied by increasing~$\alpha>0$.
+However, since we concatenate the two Sigmoid functions we obtain that the~$\tilde g_\bfa{i}>M-1$ contribute to~$\tilde P(\mathcal V)$ and this strict inequality cannot be satisfied unless~$c_\bfa{i}\in\mathcal V$ is in all~$M$ halfspaces. Therefore the interval~$[-\Delta(\alpha,\eta),0]$ does not contribute to the result as long as~$\Delta(\alpha,\eta)<1$, which can easily be satisfied by increasing~$\alpha>0$.
 %
 We illustrate the proposed method in a numerical example in the following section.
 
@@ -432,17 +435,17 @@ We illustrate the proposed method in a numerical example in the following sectio
 %
 Consider the problem of finding the largest set of states~$\mathcal X$ for the system~$x^+=x+v$ (where $x^+$ denotes the successor state) such that
 \[
-\mathbb P\{x^+\in\mathcal Y\}\geq \frac{3}{10}
+\Pr (x^+\in\mathcal Y) \geq \frac{3}{10}
 \]
-holds for~$\mathcal Y = \{y\in\mathbb R^2:-5\leq y_i\leq 4\}$, where the random variable~$v\in\Omega=\{\omega\in\mathbb R^2:\abs{\omega_i}\leq2\}$ has the known probability density function~$\mathfrak f(v)$.
+holds for~$\mathcal Y = \{y\in\mathbb R^2:-5\leq y_i\leq 4\}$, where the random variable~$v\in\Omega=\{\omega\in\mathbb R^2:\abs{\omega_i}\leq2\}$ has a known probability density function~$\mathfrak f(v)$.
 %
-The density~$\mathfrak f(v)$ we consider is a truncated normal distribution:
+The density~$\mathfrak f(v)$ we consider is a truncated normal distribution defined by
 \[
 \mathfrak f(v) = \frac{1}{c}\exp(-v_1^2-2v_2^2)
 \quad \text{with} \quad
 c=\frac{\pi\,\text{erf}(2)\,\text{erf}(2\sqrt{2})}{\sqrt 2}
 \]
-so that~$\mathbb P\{\Omega\}=1$.
+(so that~$\mathbb P\{\Omega\}=1$).
 %
 Naturally this problem can be formulated as
 %
@@ -464,37 +467,36 @@ subject to
 %
 where the Pontryagin difference in (\ref{seq:example:original}c) guarantees satisfaction of~$x^+\in\mathcal Y$ for all~$v\in\mathcal V$.
 %
-To be able to apply the proposed method we have to choose an initialising polytope~$\mathcal V_0$ which defines the combinatorial structure of~$\mathcal V$, for this we use 
+To apply the proposed method we choose an initialising polytope~$\mathcal V_0$ which defines the combinatorial structure of~$\mathcal V$, for this we use 
 %
 \[
 \mathcal V_0 = \conv\left\{\begin{pmatrix}\pm 1\\0 \end{pmatrix},\begin{pmatrix}0\\\pm1\end{pmatrix},\begin{pmatrix}\pm\frac{3}{4}\\\pm\frac{3}{4}\end{pmatrix}\right\}
 \]
 %
-and the index sets~$\mathcal A_i$ are given as~$\mathcal A_i=\{i,i+1\}$ for $i\in\{1,\dots,5\}$ and~$\mathcal A_6=\{1,6\}$ (the numeric values depend on the half-space description employed but may be rearranged).
+and the index sets~$\mathcal A_i$ are given as~$\mathcal A_i=\{i,i+1\}$ for $i\in\{1,\dots,5\}$ and~$\mathcal A_6=\{1,6\}$ (the numerical values depend on the half-space description employed but may be rearranged).
 %
 
 
 %
-Before we can rewrite~\eqref{seq:example:original} using~$\mathring P(\mathcal V)$ we first have to choose a grid and evaluate~$\mathfrak f_\bfa{i}$.
+Before rewriting~\eqref{seq:example:original} using~$\mathring P(\mathcal V)$, we first define a grid and evaluate~$\mathfrak f_\bfa{i}$.
 %
 We choose~$\delta=\frac{1}{100}$, this yields a total of~$4^2 100^2=160000$ cubes~$Q_\bfa{i}$ making up the grid~$Z$.
 %
-To deal with large numbers of double integrals over cubes~$Q_\bfa{i}$ efficiently we propose the following method:
+To deal with large numbers of double integrals over cubes~$Q_\bfa{i}$ efficiently we propose the following method.
 %
-Firstly notice that
+Since
 \begin{align*}
 \mathfrak f_\bfa{i}=\int_{Q_\bfa{i}}\mathfrak f(v) \; \mathrm d v = &\int_{\delta i_1}^{\delta(i_1+1)}\int_{\delta i_2}^{\delta(i_2+1)}\mathfrak f(v_1,v_2) \; \mathrm d v_2 \; \mathrm d v_1 \\
-= &\int_0^\delta\int_0^\delta \mathfrak f(v_1+\delta i_1,v_2+\delta i_2) \; \mathrm d v_2 \; \mathrm d v_1
+= &\int_0^\delta\int_0^\delta \mathfrak f(v_1+\delta i_1,v_2+\delta i_2) \; \mathrm d v_2 \; \mathrm d v_1 ,
 \end{align*}
-and with this we can evaluate the inner integral for all relevant~$\bfa{i}$ at once by introducing
+we can evaluate the inner integral for all relevant~$\bfa{i}$ simultaneously by introducing
 %
 \begin{multline*}
 \mathfrak F(v_1) =
 \int\limits_0^\delta 
 \bigl[ 
-\mathfrak f(v_1-200\delta,v_2-200\delta) , \ldots , \\
-%\mathfrak f(v_1-200\delta,v_2-199\delta),\dots, \\
-\mathfrak f(v_1+199\delta,v_2+199\delta) \bigr] \; \mathrm d v_2 .
+\mathfrak f(v_1-200\delta,v_2-200\delta) , \mathfrak f(v_1-200\delta,v_2-199\delta), \\
+\ldots, \mathfrak f(v_1+199\delta,v_2+199\delta) \bigr] \; \mathrm d v_2 .
 \end{multline*}
 %
 The values for all $\mathfrak f_{-200,-200}$ to~$\mathfrak f_{199,199}$ are then obtained by integrating with respect to~$v_1$, i.e. 
@@ -511,13 +513,13 @@ To avoid aliasing we choose~$\alpha=5000$, this yields~$\Delta(5000,10^{-1}) = \
 
 
 %
-In order to compare the suggested method we use a scenario-based approach similar to the one described in~\cite{Margellos:2014}.
+To evaluate the performance of the proposed method we compare it with a scenario-based approach similar to the one described in~\cite{Margellos:2014}.
 %
 For this we draw a sufficient number of samples~$\{v_1,\dots,v_n\}\subseteq\Omega$ of the random variable, where the number~$n$ is chosen to satisfy
 \[
 \Phi(1-p,d,n) = \sum_{k=0}^{d}\binom{n}{k}(1-p)^kp^{n-k}<\beta
 \]
-for a confidence~$\beta>0$, see e.g.~\cite{Calafiore:2010}, which we choose as~$\beta=\frac{1}{1000}$.
+for a confidence~$\beta>0$ (see e.g.~\cite{Calafiore:2010}), which we choose as~$\beta=\frac{1}{1000}$.
 %
 The necessary number~$n$ can be upper bounded by the smallest integer satisfying~$\tilde n>\frac{2}{1-p}(d-\log(\beta))$, however for this example we can explicitly evaluate~$\Phi(\frac{7}{10},2,n)$ to find $\Phi(\frac{7}{10},2,\{10,11\}) = \{0.00159039,0.000577696\}$, i.e. eleven samples are required for scenario based statements to hold with confidence larger then~$1-\beta=\frac{999}{1000}$.
 %
@@ -534,12 +536,13 @@ Due to issues related to the nonlinear programming solver, the objective functio
 
 
 %
-Notice that the bound~$e(\mathcal V) = \lvert\mathbb P\{\mathcal V\}-\mathring{P}(\mathcal V)\rvert$ depends on the measure on the cubes which intersect the boundary of~$\mathcal V$, this means that for non-uniform distributions the error~$e(\mathcal V)$ decreases with the distance from the expected value.
+Notice that the error bound~$e(\mathcal V) = \lvert\mathbb P\{\mathcal V\}-\mathring{P}(\mathcal V)\rvert$ depends on the measure of the cubes which intersect the boundary of~$\mathcal V$, this means that for non-uniform distributions the error~$e(\mathcal V)$ decreases with the distance from the expected value.
 %
 This implies that a non-uniform grid size such that for each $Q_\bfa{i}$ the measure~$0<\mathfrak{f}_\bfa{i}<\epsilon$ for some fixed~$\epsilon$ may be used to reduce the number of necessary cubes as well as the dependence of the error~$e(\mathcal V)$ on the inner radius of~$\mathcal V$.
 
 \begin{figure}\centering
 \include{result.tikz}
+\captionsetup{font=small}
 \caption{Outlined in black the result~$\mathcal V$ of the optimisation~\eqref{seq:example:original}, the \textcolor{red}{red points} show samples drawn for this distribution and $100$~red outlined sets are convex hulls of a random selection of~$N=11$ samples such that any~$\textcolor{red}{\hat{\mathcal V}}$ allows statements on~\eqref{seq:example:original} to be made with a confidence larger than~$0.999$.
 %
 The result for the non-homogeneous grid discussed in Section~\ref{sec:improved:grid} is outlined in~\textcolor{blue}{blue}.}
@@ -554,20 +557,20 @@ The result for the non-homogeneous grid discussed in Section~\ref{sec:improved:g
 %
 \noindent In the previous section we presented a simple example using a homogeneous grid, this led to a large number of cubes~$Q_\bfa{i}$ and hence centre points~$c_\bfa{i}$.
 %
-Notice that the central approximation~\eqref{eq:central:approximation:formula} does not require a homogeneous grid nor does Lemma~\ref{thm:sandwich:inequality}, we therefore present a method to determine a grid which reflects the properties of the probability density function more closely.
+Since the central approximation~\eqref{eq:central:approximation:formula} does not require a homogeneous grid and neither does Lemma~\ref{thm:sandwich:inequality}, we present in this section a method to determine a grid which reflects the properties of the probability density function more closely.
 %
-We consider a compact probability space~$\Omega\subseteq\mathcal B$ for some box~$\mathcal B=\{x\in\mathbb R^d:-\mathfrak{c}\leq x_i\leq \mathfrak{c}\}$.
+We consider a compact sample space~$\Omega\subseteq\mathcal B$ for some box~$\mathcal B=\{x\in\mathbb R^d:-\mathfrak{c}\leq x_i\leq \mathfrak{c}\}$.
 %
 The algorithm we suggest is to define a polytopal complex~$\mathcal C$ consisting of cubes~$Q_i$ such that~$\bigcup_{Q_i\in\mathcal C}Q_i=\mathcal B$ and the associated probability measure of each cube is below a certain threshold~$\mathfrak{f}_i\leq\mathfrak{f}_{\max}$.
 %
 To do this efficiently first notice that
 \begin{multline*}
-\int_0^{\delta}\dots\int_0^\delta f(t_1,\dots,t_d)\; \mathrm d t_1\dots \mathrm dt _d = \\ \delta^d\int_0^1\dots\int_0^1f(\delta\tau_1,\dots,\delta\tau_d)
-\; \mathrm d\tau_1\dots \mathrm d\tau_d, 
+\int_0^{\delta}\dots\int_0^\delta \mathfrak{f}(t_1,\dots,t_d)\; \mathrm d t_1\dots \mathrm dt _d = \\ \delta^d\int_0^1\dots\int_0^1 \mathfrak {f}(\delta\tau_1,\dots,\delta\tau_d)
+\; \mathrm d\tau_1\dots \mathrm d\tau_d .
 \end{multline*}
-while this is a trivial substitution it allows the simultaneous computation of~$\mathfrak{f}_i$ over differently sized cubes~$Q_i$.
+Although this is a trivial substitution, it allows the simultaneous computation of~$\mathfrak{f}_i$ over differently sized cubes~$Q_i$.
 %
-Let~$\{q_1,\dots,q_{2^d}\}$ denote the vertices of the cube~$\mathcal Q=\{x\in\mathbb R^d: 0\leq x_i\leq 1\}$, for this algorithm it is more convenient to characterise cubes by their \emph{lower left corner}~$b_i$ and their side length~$\delta_i$, i.e. the $i$-th cube is given by~$Q_i=\conv_{1\leq k\leq2^d}\{b_i+\delta_i q_k\}$, the associated measure is given by
+Let~$\{q_1,\dots,q_{2^d}\}$ denote the vertices of the cube~$\mathcal Q=\{x\in\mathbb R^d: 0\leq x_i\leq 1\}$. For this algorithm it is convenient to characterise cubes by their \emph{lower left corner}~$b_i$ and their side length~$\delta_i$, so that the $i$th cube is given by~$Q_i=\conv_{1\leq k\leq2^d}\{b_i+\delta_i q_k\}$, and the associated measure is given by
 \[
 \mathfrak{f}_i=\int_{\mathcal Q}\mathfrak{f}(b_i+\delta_i\bfa{1} t) \; \mathrm d t.
 \]
@@ -575,7 +578,7 @@ Let~$\{q_1,\dots,q_{2^d}\}$ denote the vertices of the cube~$\mathcal Q=\{x\in\m
 We propose the following algorithm to determine~$\mathcal C$:
 %
 \begin{algo}\label{algo:non:homo:cubes}
-Choose desired~$\mathfrak{f}_{\max}>0$ and~$\delta_{\min}>0$ and set~$\mathcal C=\mathcal B$ evaluate~$\mathfrak{f}_i$\\
+Choose desired~$\mathfrak{f}_{\max}>0$ and~$\delta_{\min}>0$, set~$\mathcal C=\mathcal B$ and evaluate~$\mathfrak{f}_i$\\
 \textbf{WHILE} ($\max_i\{\mathfrak{f}_i\}\geq\mathfrak{f}_{\max}$~\textbf{AND}~$\min\{\delta_i\}\geq\delta_{\min}$) \textbf{DO} $\bigl($\\
 $IDX := \mathfrak{f}_i\geq \mathfrak{f}_{\max}$\\
 \textbf{FOR} $i\in IDX$ $\{$ \textbf{REPLACE} $b_i$ by $b_i+q_k$, $k\in\{1,\dots,2^d\}$ 
@@ -585,7 +588,7 @@ and $\delta_i$ by~$\frac{\delta_i}{2}\}$\\
 $\bigr)$
 \end{algo}
 %
-The Algorithm~\ref{algo:non:homo:cubes} terminates once either every cube contains a probability measure below the set threshold or some cubes become too small, otherwise it replaces all cubes for which the probability measure is larger than~$\mathfrak{f}_{\max}$ with cubes with a halved side length.
+Algorithm~\ref{algo:non:homo:cubes} terminates either when every cube contains a probability measure below the threshold $\mathfrak{f}_{\max}$ or when some cubes become smaller than the threshold $\delta_{\min}$. Otherwise it replaces all cubes for which the probability measure is larger than~$\mathfrak{f}_{\max}$ with cubes with a halved side length.
 %
 Once the grid is found the centre points are given by~$c_i=b_i+\frac{\delta_i}{2}\bfa{1}$.
 %
@@ -596,16 +599,19 @@ Algorithm~\ref{algo:non:homo:cubes} can reduce the computational overhead signif
 %
 For the same example as in Section~\ref{sec:example} with a non-homogeneous grid satisfying~$\mathfrak{f}_i\leq\frac{1}{20000}$ which yields~$\min_i\{\delta_i\}=\frac{1}{2^7}=0.0078125$,~$\max_i\{\delta_i\}=\frac{1}{2}$ and a total of~$45436$ cubes.
 %
-Since~\eqref{eq:central:approximation:formula} does not depend on the choice of the grid itself the remaining optimisation is unchanged, a single evaluation of~$\mathring{P}(\mathcal V)$ now takes~$0.025115$, i.e. about five times  faster than the homogeneous counterpart, the resulting set~$\mathcal V$ is shown in \textcolor{blue}{blue} in Figure~\ref{fig:example:in:comparison}.
+Since~\eqref{eq:central:approximation:formula} does not depend on the choice of the grid itself the remaining optimisation is unchanged, a single evaluation of~$\mathring{P}(\mathcal V)$ now takes $0.0251$ seconds,
+%~$0.025115$, 
+i.e. about five times  faster than the homogeneous counterpart. The resulting set~$\mathcal V$ is shown in \textcolor{blue}{blue} in Figure~\ref{fig:example:in:comparison},
+% and numerical values are reported in Table~\ref{tab:only:table}.
 %
-We illustrate a slightly less fine grid in Figure~\ref{fig:inhomogeneous:grid}.
+For illustrative purposes, Figure~\ref{fig:inhomogeneous:grid} shows a (slightly less fine) grid constructed using Algorithm~\ref{algo:non:homo:cubes}.
 
 %
 We summarise the numerical values of the proposed schemes in Table~\ref{tab:only:table}.
 %
-The first row shows the values for the homogeneous grid with~$160000$ cubes, with no direct influence on the measure content of each box, the second row for the inhomogeneous grid, the third row shows the resulting values for the grid shown in Figure~\ref{fig:inhomogeneous:grid}. 
+The first row of the table shows values for the homogeneous grid with~$160000$ cubes (with no direct influence on the measure of each box), the second row gives values for the inhomogeneous grid, while the third row shows the values obtained with the grid shown in Figure~\ref{fig:inhomogeneous:grid}. 
 %
-Both scenario based sets are evaluated on the inhomogeneous grid, while~$\underline{P}(\mathcal V)$ and~$\overline{P}(\mathcal V)$ are evaluated on extreme values of the generated convex hulls $\mathring{P}(\mathcal V)$ is the arithmetic mean of all $100$ sample sets.
+Both scenario based sets are evaluated on the inhomogeneous grid, with~$\underline{P}(\mathcal V)$ and~$\overline{P}(\mathcal V)$ evaluated at extreme values of the generated convex hulls, and the values of $\mathring{P}(\mathcal V)$ are the  arithmetic means of all $100$ sample sets.
 %
 
 %
@@ -616,7 +622,10 @@ Both scenario based sets are evaluated on the inhomogeneous grid, while~$\underl
 \begin{figure}\centering
 \ifodd0
 \include{grid.tikz}
+\else
+\vspace{88mm}
 \fi
+\captionsetup{font=small}
 \caption{The inhomogeneous grid generated by Algorithm~\ref{algo:non:homo:cubes} for the values $\max\{\mathfrak{f}_i\}\leq\frac{1}{10000}$ and~$\min\{\delta_i\}\geq\frac{1}{10000}$ which produces~$20404$ cubes.
 %
 Outlined in \textcolor{blue}{blue} the optimised set~$\mathcal V$.}
@@ -626,18 +635,20 @@ Outlined in \textcolor{blue}{blue} the optimised set~$\mathcal V$.}
 %
 %
 \begin{table}
-\begin{tabular}{|c|c|c|c|c|c|}
+\begin{tabular}{|c|c|c|c|c|c|@{\rule{0pt}{9pt}}}
 \hline
 & $\underline{P}(\mathcal V)$ & $\overline{P}(\mathcal V)$ & $\mathring{P}(\mathcal V)$ & $\max\{\mathfrak{f}_{\bfa{i}}\}$ & $\min\{\mathfrak{f}_\bfa{i}\}$\\
 \hline HG $\abs{\bfa{i}}=16e4$ & $0.2909$ & $0.3138$ & $0.3002$ & $4.5e^{-5}$ & $3.0e^{-10}$ \\
-\hline IG $\abs{\bfa{i}}=45436$ & $0.2954$ & $0.3045$ & $0.3025$ & $5.0e^{-5}$ & $4.4e^{-6}$ \\
-\hline IG $\abs{\bfa{i}}=20404$ & $0.2871$ & $0.3050$ & $0.3008$ & $1.0e^{-4}$ & $1.3e^{-5}$ \\
+\hline IG $\abs{\bfa{i}}=45436$ & $0.2954$ & $0.3045$ & $0.3025$ & $5.0e^{-5}$ & $4.4e^{-6}$ \\
+\hline IG $\abs{\bfa{i}}=20404$ & $0.2871$ & $0.3050$ & $0.3008$ & $1.0e^{-4}$ & $1.3e^{-5}$ \\
 \hline Sc $N=11$ & $0.2602$ & $0.7981$ & $0.5356$ & $5.0e^{-5}$ & $4.4e^{-6}$ \\ 
 \hline Sc $N=26$ & $0.4834$ & $0.8875$ & $0.7375$ & $5.0e^{-5}$ & $4.4e^{-6}$ \\
 \hline 
 \end{tabular}
-\caption{}
+\captionsetup{font=small}
+\caption{Probability bounds for homogeneous (HG) and non-homogeneous (IG) grids, and for scenario-based approaches (Sc).}
 \label{tab:only:table}
+%\vspace{1mm}
 \end{table}
 
 
@@ -649,26 +660,26 @@ Outlined in \textcolor{blue}{blue} the optimised set~$\mathcal V$.}
 %
 %
 %
-\noindent In this paper we presented a method to optimise an auxiliary polytope guaranteeing constraint satisfaction of a probabilistic condition, as it could arise in a stochastic model predictive control environment.
+\noindent In this paper we presented a method to optimise an auxiliary polytope guaranteeing constraint satisfaction of a probabilistic condition, as it could arise in an application of stochastic model predictive control.
 %
-For the optimisation the combinatorial structure of the auxiliary set has to be predetermined to obtain a finite dimensional optimisation program.
+To obtain a finite dimensional formulation of the optimisation, we assume a predetermined combinatorial structure of the auxiliary set, which allows for a finite parameterisation. 
 %
-The probabilistic measure of the auxiliary set is approximated using a Riemann-like approximation of the involved integral, for which we used that numerical integration over a cube is significantly simpler than over an arbitrary polytope.
+The probabilistic measure of the auxiliary set is approximated using a Riemann-like approximation of the required integral, and by exploiting the fact that numerical integration over a hypercube is significantly simpler than over an arbitrary polytope.
 %
-We presented two methods of obtaining a suitable grid, a homogeneous grid can be generated simply and has an a-priori known number of cubes, which can be intractably large.
+We presented two methods of obtaining a suitable grid, a homogeneous grid can be generated simply and has an a priori known number of cubes, which could however be intractably large.
 %
-An inhomogeneous grid can be determined iteratively and will generally produce a smaller number of cubes, the number of cubes is not a priori known.
+An inhomogeneous grid can be determined iteratively and will generally produce a smaller number of cubes, although the number of cubes is not a priori known.
 %
 For both methods the synthesis works identically and produced superior results over a conventional scenario-based approach in our example.
 %
 
 
 %
-Similar to many other polytope-based methods the proposed scheme does not scale well with dimension, this is due to the fact that the combinatorial structure itself becomes complex with rising dimension, higher dimensional problems will yield a large number of decision variables and nonlinear constraints.
+Similar to many other polytope-based methods the proposed scheme does not scale well with dimension $d$, this is due to the fact that the combinatorial structure itself becomes complex with rising dimension, higher dimensional problems will yield a large number of decision variables and nonlinear constraints.
 %
-Furthermore, the number of cubes~$Q_\bfa{i}/Q_i$ which have to be evaluated during the optimisation becomes prohibitively large with increasing dimension for either homogeneous and inhomogeneous grids.
+Furthermore, the number of cubes ($Q_\bfa{i}$ or $Q_i$) that have to be evaluated during the optimisation becomes prohibitively large with increasing dimension for both homogeneous and inhomogeneous grids.
 %
-For both grids we proposed here the probability space has to be bounded, an inhomogeneous grid could be used to cover the unbounded cases, e.g. by choosing a box centred at the expected value with probability measure indistinguishable from one by machine precision.
+For both grids proposed here, the sample space was also assumed to be bounded. We note, however, that an inhomogeneous grid could be used in problems with unbounded sample spaces, for example by choosing a bounding box centred at the expected value with probability measure indistinguishable from one to machine precision.
 
 \printbibliography
 \end{document}

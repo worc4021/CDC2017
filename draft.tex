@@ -76,6 +76,7 @@
 \newcommand{\bigominus}{\raisebox{10pt}{$\temp$}}
 
 \DeclareMathOperator*{\maximize}{maximize}
+\DeclareMathOperator*{\minimize}{minimize}
 
 \graphicspath{{./Pix/}}
 
@@ -237,7 +238,7 @@ Lemma~\ref{thm:combinatorial:equivalence} provides a canonical way to rewrite th
 %
 \begin{subequations}\label{seq:simplified:problem:description}
 \begin{equation}
-	\min_{a_i,b_i,v_j} f(\mathcal V) % \min_{\substack{a_1,b_1\\a_2,b_2\\ \vdots \\ v_1\\v_2\\ \vdots}}f(\mathcal V)
+	\minimize_{a_i,b_i,v_j} f(\mathcal V) % \min_{\substack{a_1,b_1\\a_2,b_2\\ \vdots \\ v_1\\v_2\\ \vdots}}f(\mathcal V)
 \end{equation}
 %
 subject to

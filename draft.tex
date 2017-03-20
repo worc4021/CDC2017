@@ -17,6 +17,9 @@
 \usepackage{todonotes}
 \usepackage[hidelinks]{hyperref}
 \usepackage{caption}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
 
 \usepackage{tikz}
 \usetikzlibrary{arrows,positioning,patterns,decorations.pathreplacing,calc,shapes.geometric}
@@ -518,7 +521,7 @@ For this we draw a sufficient number of samples~$\{v_1,\dots,v_n\}\subseteq\Omeg
 \[
 \Phi(1-p,d,n) = \sum_{k=0}^{d}\binom{n}{k}(1-p)^kp^{n-k}<\beta
 \]
-for a confidence~$\beta>0$ (see e.g.~\cite{Calafiore:2010}), which we choose as~$\beta=\frac{1}{1000}$.
+for a confidence~$\beta>0$ (see e.g.~\cite{calafiore2010}), which we choose as~$\beta=\frac{1}{1000}$.
 %
 The necessary number~$n$ can be upper bounded by the smallest integer satisfying~$\tilde n>\frac{2}{1-p}(d-\log(\beta))$, however for this example we can explicitly evaluate~$\Phi(\frac{7}{10},2,n)$ to find $\Phi(\frac{7}{10},2,\{10,11\}) = \{0.00159039,0.000577696\}$, i.e. eleven samples are required for scenario based statements to hold with confidence larger then~$1-\beta=\frac{999}{1000}$.
 %
@@ -574,19 +577,26 @@ Let~$\{q_1,\dots,q_{2^d}\}$ denote the vertices of the cube~$\mathcal Q=\{x\in\m
 \mathfrak{f}_i=\int_{\mathcal Q}\mathfrak{f}(b_i+\delta_i\bfa{1} t) \; \mathrm d t.
 \]
 %
-We propose the following algorithm to determine~$\mathcal C$:
+We propose the following algorithm to determine~$\mathcal C$.
+
+\begin{algorithm}[h]
+\caption{: Non-homogeneous grid generation \label{algo:non:homo:cubes}}
+Choose desired~$\mathfrak{f}_{\max}>0$ and~$\delta_{\min}>0$,
+set~$\mathcal C=\mathcal B$ and \\
+evaluate~$\mathfrak{f}_i$\\
+\textbf{while}
+($\max_i\{\mathfrak{f}_i\}\geq\mathfrak{f}_{\max}$~and~$\min\{\delta_i\}\geq\delta_{\min}$) \textbf{do}\\
+\mbox{}\quad$IDX := \mathfrak{f}_i\geq \mathfrak{f}_{\max}$\\
+\mbox{}\quad\textbf{for} $i\in IDX$ \textbf{do} \\
+\mbox{}\quad\quad replace~$b_i$ by $b_i+q_k$, $k=1,\dots,2^d$ 
+and $\delta_i$ by~$\frac{\delta_i}{2}$ \\
+\mbox{}\quad\textbf{end}\\
+\mbox{}\quad evaluate~$\mathfrak f_i, i\in IDX$ \\
+\quad update~$\mathcal C$ \\
+\textbf{end}
+\end{algorithm}
 %
-\begin{algo}\label{algo:non:homo:cubes}
-Choose desired~$\mathfrak{f}_{\max}>0$ and~$\delta_{\min}>0$, set~$\mathcal C=\mathcal B$ and evaluate~$\mathfrak{f}_i$\\
-\textbf{WHILE} ($\max_i\{\mathfrak{f}_i\}\geq\mathfrak{f}_{\max}$~\textbf{AND}~$\min\{\delta_i\}\geq\delta_{\min}$) \textbf{DO} $\bigl($\\
-$IDX := \mathfrak{f}_i\geq \mathfrak{f}_{\max}$\\
-\textbf{FOR} $i\in IDX$ $\{$ \textbf{REPLACE} $b_i$ by $b_i+q_k$, $k\in\{1,\dots,2^d\}$ 
-and $\delta_i$ by~$\frac{\delta_i}{2}\}$\\
-\textbf{EVALUATE}~$\mathfrak f_i, i\in IDX\\
-\textbf{UPDATE}~\mathcal C$
-$\bigr)$
-\end{algo}
-%
+
 Algorithm~\ref{algo:non:homo:cubes} terminates either when every cube contains a probability measure below the threshold $\mathfrak{f}_{\max}$ or when some cubes become smaller than the threshold $\delta_{\min}$. Otherwise it replaces all cubes for which the probability measure is larger than~$\mathfrak{f}_{\max}$ with cubes with a halved side length.
 %
 Once the grid is found the centre points are given by~$c_i=b_i+\frac{\delta_i}{2}\bfa{1}$.
@@ -665,9 +675,9 @@ To obtain a finite dimensional formulation of the optimization, we assume a pred
 %
 The probabilistic measure of the auxiliary set is approximated using a Riemann-like approximation of the required integral, and by exploiting the fact that numerical integration over a hypercube is significantly simpler than over an arbitrary polytope.
 %
-We present two methods of obtaining a suitable grid. A homogeneous grid can be generated simply and has an a priori known number of cubes, which could however be intractably large.
+We present two methods of obtaining a suitable grid. A homogeneous grid can be generated simply and has an a priori known number of cubes, which could however be large.
 %
-An inhomogeneous grid can be determined iteratively and will generally produce a smaller number of cubes, although the number of cubes is not a priori known.
+An inhomogeneous grid can be determined iteratively and generally produces smaller numbers of cubes, although the number of cubes is not a priori known.
 %
 For both methods the synthesis works identically and produced superior results over a conventional scenario-based approach in our example.
 %

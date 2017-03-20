@@ -21,16 +21,16 @@
 \usepackage{tikz}
 \usetikzlibrary{arrows,positioning,patterns,decorations.pathreplacing,calc,shapes.geometric}
 
-\usepackage[backend=biber,
-			sortcites=true,
-			sorting=none,
-			style=numeric-comp,
-			firstinits=true,
-			doi=false,
-			isbn=false,
-			url=false
-			]{biblatex}
-\bibliography{MyBib}
+% \usepackage[backend=biber,
+% 			sortcites=true,
+% 			sorting=none,
+% 			style=numeric-comp,
+% 			firstinits=true,
+% 			doi=false,
+% 			isbn=false,
+% 			url=false
+% 			]{biblatex}
+% \bibliography{MyBib}
 
 
 % \DeclareNameFormat{author}{%
@@ -82,12 +82,12 @@
 \graphicspath{{./Pix/}}
 
 \begin{document}
-\title{A set based approach to chance constrained programming}
+\title{A set-based approach for chance-constrained programming}
 
 \author{Rainer M. Schaich\textsuperscript{\dag} %
          and Mark Cannon\textsuperscript{\dag,\ddag}%
-\thanks{\textsuperscript{\dag} Department of Engineering Science, University of Oxford, OX1 3PJ.}%
-\thanks{\textsuperscript{\ddag} Corresponding author, 
+\thanks{\textsuperscript{\dag}Department of Engineering Science, University of Oxford, OX1~3PJ,~UK}%
+\thanks{\textsuperscript{\ddag}Corresponding author, 
         \texttt{mark.cannon@eng.ox.ac.uk}.}
 }
 \newcommand{\note}[1]{\todo[inline]{#1}}
@@ -95,19 +95,11 @@
 \maketitle
 
 \begin{abstract} 
-For a certain class of stochastic programming problems we introduce a method to robustify the problem and thereby reduce the complexity while introducing a minimal amount of uncertainty.
-%
-An optimal auxiliary polytope is determined using a nonlinear optimisation program, this auxiliary set can then be used to solve a deterministic problem guaranteeing probabilistic constraint satisfaction.
-%
-We furthermore present a method to determine the probability measure of a polytope efficiently using Riemann-like sums over a grid.
-%
-Methods to generate both homogeneous and inhomogeneous grids are presented.
-%
-The proposed scheme is illustrated and compared with state-of-the-art alternatives in an example.
+For a class of optimization problems with probabilistic constraints we introduce a robustification method that reduces problem complexity while controlling the level of uncertainty and conservativeness in the solution. The method uses an auxiliary polytopic set defined by a nonlinear optimization to formulate a deterministic programming problem guaranteeing probabilistic constraint satisfaction. We furthermore present a method to determine the probability measure of a polytope efficiently using Riemann-like sums over a grid. Methods to generate both homogeneous and inhomogeneous grids are presented. The proposed scheme is illustrated and compared with state-of-the-art alternatives in a numerical example.
 \end{abstract}
 
 \begin{keywords}
-keyword 1, keyword 2, keyword 3...
+Chance-constrained optimization, robust optimization, uncertain systems, robust control.
 \end{keywords}
 %%%%%%%%%%%%%%%%%%%%%%%
 
@@ -117,31 +109,36 @@ keyword 1, keyword 2, keyword 3...
 %
 %
 %
-\noindent Optimisation problems with probabilistic constraints on the decision variable arise in various domains of science.
+\noindent
+Optimization problems with probabilistic constraints on decision variables have been considered since the seminal work of Charnes and Cooper~\cite{charnes59,charnes63}. These problems, which are also known as chance-constrained programming problems, occur in diverse control design and process optimization settings~\cite{polyak01,fujisaki03,wendt02,ma12,tempo05,kouvaritakis06,lejeune07,henrion03,murr00}. 
 %
-A prominent approach to solving such problems is to employ a scenario based approach~\cite{Calafiore:2010}, for which a deterministic optimisation program is solved for a sufficiently large number of sampled probabilistic constraints.
-%
-This way constraint satisfaction with a chosen confidence is guaranteed, however the number of samples necessary generally depends on the dimension, the desired probability and confidence level and is often unnecessarily large.
-%
-In cases for which we have more particular knowledge of the meaning of the probabilistic constraints it is often possible to reformulate the stochastic problem as a robust optimisation problem which can be solved using existing methods.
-%
-The trivial way would be to satisfy the probabilistic constraints with certainty, which reduces the complexity of the problem but increases the conservatism of its solution.
-%
-Here we present a more sophisticated approach, we determine an auxiliary subset of the uncertain variable for which the probabilistic constraints are satisfied.
+With the exception of special cases, constraints on decision variables that are required to hold with a specified probability generally result in nonconvex optimization problems, even when the objective and constraints are themselves convex~\cite{prekopa95}.
 %
 
-To be able to determine such auxiliary sets we have to constrain the search space to polytopes of a given combinatorial structure.
+In order to avoid the computational difficulties of exact solutions of nonconvex chance-constrained optimization problems, prominent methods for solving these problems employ scenario based approaches~\cite{campi08,calafiore2010}. These involve solving deterministic optimization programs for sufficiently large numbers of samples of random variables that define the probabilistic constraints.
+%
+In this way, constraint satisfaction can be ensured with a chosen level of confidence. However the number of samples required (which depends on the dimension of the decision variable, the desired probability of constraint satisfaction and the confidence level), is often large, and this can result in implementation difficulties and a high degree of conservativeness in the approximate solution.  
+%
+
+In cases for which specific knowledge of the structure of the probabilistic constraints is available, it is often possible to reformulate the stochastic problem as a robust optimization problem which can be solved using deterministic programming methods.
+%
+An overly simplistic way to do this is to enforce satisfaction of the probabilistic constraints with certainty; this reduces the complexity of the problem but increases the conservatism of its solution.
+%
+Here we present a more sophisticated approach, which determines an auxiliary subset of the uncertain variable for which the probabilistic constraints are satisfied.
+%
+
+To determine such auxiliary sets, we constrain the search space to polytopes of a given combinatorial structure.
 %
 This allows us to formulate a nonlinear programming problem to determine an optimal auxiliary set which can then be used to robustify the original stochastic program introducing a minimal amount of conservatism.
 %
-We present a method to approximate the probability measure of the auxiliary set in a computationally tractable way using a grid based discretisation of the probability space.
+We present a method to approximate the probability measure of the auxiliary set in a computationally tractable way using an approximate discretisation of the probability space. 
 %
-
+The paper extends and generalises the approaches of~\cite{Dentcheva2009} and~\cite{Schaich:2017}; both of these use parametrised sets with a specified probability measure to enforce chance constraints, but the p-efficiency approach of~\cite{Dentcheva2009} requires a specific constraint structure while the auxiliary set method of~\cite{Schaich:2017} is restricted to uniform probability distributions. Furthermore, unlike the related sampling-based approaches of~\cite{Zhang2015,Margellos:2014}, our approach ensures probabilistic constraint satisfaction with certainty.
 
 %
 This paper is structured as follows:
 %
-In Section~\ref{sec:problem:formulation} we present the problem description we consider, Section~\ref{sec:optimising:polytopes} discusses the proposed method to reduce the uncountably infinite dimensional optimisation problem introduced in Section~\ref{sec:problem:formulation} to a finite dimensional nonlinear optimisation program.
+In Section~\ref{sec:problem:formulation} we present the problem description under consideration, Section~\ref{sec:optimising:polytopes} discusses the proposed method to reduce the uncountably infinite-dimensional optimization problem introduced in Section~\ref{sec:problem:formulation} to a finite-dimensional nonlinear optimization.
 %
 Section~\ref{sec:counting:cubes} deals with the problem of approximating the probability measure of a polytope using a homogeneous discretisation of the probability space, thereby reducing integrals into finite sums which can be efficiently evaluated.
 %
@@ -149,12 +146,12 @@ We illustrate the proposed scheme in Section~\ref{sec:example} and compare the r
 %
 A method to determine a inhomogeneous discretisation of the probability space is presented in Section~\ref{sec:improved:grid}.
 %
-Section~\ref{sec:conclusion} concludes this work and gives possible future directions of research.
+Section~\ref{sec:conclusion} presents conclusions and gives possible future directions of research.
 %
 
 
 %
-Throughout the paper we use the term \textit{$d$-dimensional polytope} to refer to a bounded set containing a $d$-dimensional ball and formed by the intersection of a finite number of halfspaces or equivalently by the convex hull of a finite number of points.
+Throughout the paper we use the term \textit{$d$-dimensional polytope} to refer to a bounded set that contains a $d$-dimensional ball and is formed by the intersection of a finite number of halfspaces or equivalently by the convex hull of a finite number of points.
 A \textit{face} of a polytope is its intersection with a hyperplane such that the polytope lies on one side of the hyperplane; the dimension of the face is the dimension of the affine hull of this intersection; one-, two- and ${(d-1)}$-dimensional faces are called \textit{vertices}, \textit{edges} and \textit{facets} respectively. 
 We use $\mathcal Q \cong \mathcal S$ to indicate that polytopes~$\mathcal Q$ and $\mathcal S$ are \textit{combinatorially equivalent}.
 %
@@ -168,7 +165,7 @@ For sets $\mathcal X,\mathcal Y\subseteq\mathbb R^d$, the Minkowski sum is denot
 %
 %
 %
-We consider an optimisation problem in which the decision variable is a subset of a given set $\Omega \subseteq \mathbb R^d$: 
+We consider an optimization problem in which the decision variable is a subset of a given set $\Omega \subseteq \mathbb R^d$: 
 %
 \begin{subequations}\label{seq:main:problem}
 \begin{equation}
@@ -217,7 +214,7 @@ The focus of the remainder of this paper is on constructing a method of approxim
 %
 %
 %
-\noindent In order to derive an optimisation method for polytopes we recall the following definition:
+\noindent In order to derive an optimization method for polytopes we recall the following definition:
 %
 \begin{defn}[\cite{Ziegler:1995}]
 The polytopes~$\mathcal Q$ and~$\mathcal S$ are combinatorially equivalent if there exists a map~$\mathcal T$ that maps~$\mathcal Q$ onto~$\mathcal S$ while preserving faces, i.e. vertices of~$\mathcal Q$ map to vertices of~$\mathcal T(\mathcal Q)=\mathcal S$, edges of~$\mathcal Q$ map to edges of~$\mathcal S$ and so on.
@@ -237,7 +234,7 @@ We therefore have the following statement:
 Let~$\mathcal Q$ and $\mathcal S$ be full dimensional polytopes in~$\mathbb R^d$, then $\mathcal Q\cong\mathcal S$ if and only if they induce the same index sets~$\mathcal A_j$ as defined in~\eqref{eq:definition:of:index:set}.
 \end{thm}
 %
-Lemma~\ref{thm:combinatorial:equivalence} provides a canonical way to rewrite the optimisation problem~\eqref{seq:main:problem} for combinatorially constrained~$\mathcal V\cong\mathcal V_0$:
+Lemma~\ref{thm:combinatorial:equivalence} provides a canonical way to rewrite the optimization problem~\eqref{seq:main:problem} for combinatorially constrained~$\mathcal V\cong\mathcal V_0$:
 %
 \begin{subequations}\label{seq:simplified:problem:description}
 \begin{equation}
@@ -274,7 +271,7 @@ Such affine maps can be explicitly inverted using the Pontryagin difference and 
 The constraints introduced in~\eqref{seq:simplified:problem:description} generally result in a non-convex feasible set.
 %
 We note, however, that the question of convexity of the general problem~\eqref{seq:main:problem} is ill-posed because the set of measurable sets (on which~\eqref{seq:main:problem} could be sensibly defined) is not a vector space, and in fact even the set of convex measurable sets is not a vector space.
-In particular, $f(\lambda\mathcal V_1\oplus(1-\lambda)\mathcal V_2)\leq\lambda f(\mathcal V_1)+(1-\lambda)f(\mathcal V_2)$ for all $\lambda\in[0,1]$ does NOT imply that there exists a unique optimum~$\mathcal V^\prime$ such that $f(\mathcal V^\prime)\leq f(\mathcal V^\prime\oplus\tilde{\mathcal V})$ for all admissible~$\tilde{\mathcal V}$.
+In particular, $f(\lambda\mathcal V_1\oplus(1-\lambda)\mathcal V_2)\leq\lambda f(\mathcal V_1)+(1-\lambda)f(\mathcal V_2)$ for all $\lambda\in[0,1]$ does not imply that there exists a unique optimum~$\mathcal V^\prime$ such that $f(\mathcal V^\prime)\leq f(\mathcal V^\prime\oplus\tilde{\mathcal V})$ for all admissible~$\tilde{\mathcal V}$.
 %
 %Since the property of convexity relies on certain structures of the topology on which it is defined, no useful definition of convexity for problem~\eqref{seq:main:problem} can be made, therefore we cannot expect a simplification such as~\eqref{seq:simplified:problem:description} to be a convex finite dimensional problem.
 %\textcolor{red}{I'm not sure if this is a particularly good remark.. I think it is important to say that something like~$f(\lambda\mathcal V_1\oplus(1-\lambda)\mathcal V_2)\leq\lambda f(\mathcal V_1)+(1-\lambda)f(\mathcal V_2)$ does NOT imply that there exists a unique optimum~$\mathcal V^\prime$ such that $f(\mathcal V^\prime)\leq f(\mathcal V^\prime\oplus\tilde{\mathcal V})$ for all admissible~$\tilde{\mathcal V}$.}
@@ -295,7 +292,7 @@ In the next section we discuss a method to approximate integrals like~\eqref{eq:
 %
 %
 %
-\noindent To be able to solve the optimisation program~\eqref{seq:simplified:problem:description} with existing nonlinear programming solvers we require a numerically tractable way of evaluating the probabilistic measure of the decision variable~\eqref{eq:probability:of:decision:variable}, i.e. a way of determining the integral~\eqref{eq:integral:probability}.
+\noindent To be able to solve the optimization program~\eqref{seq:simplified:problem:description} with existing nonlinear programming solvers we require a numerically tractable way of evaluating the probabilistic measure of the decision variable~\eqref{eq:probability:of:decision:variable}, i.e. a way of determining the integral~\eqref{eq:integral:probability}.
 %
 To this end we define the homogeneous grid~$Z$ over $\Omega\subseteq\mathbb R^d$ using cubes, denoted $Q_{\bfa{i}}$, defined in terms of a multi-index $\bfa{i}=\{i_1,\ldots,i_d\}$ by
 %
@@ -344,7 +341,7 @@ Identity~\eqref{eq:sandwich:synthetical} follows trivially from the fact that~$c
 For identity~\eqref{eq:sandwich:analytical} we use the fact that~$\underline P(\mathcal V)$ and~$\overline{P}(\mathcal V)$ are respectively the exact integrals (in the sense of the Lebesgue measure) over inner and outer approximations of~$\mathcal V$, and~\eqref{eq:sandwich:analytical} and~$\lim_{\delta\searrow0}\underline{P}(\mathcal V)=\mathbb{P}(\mathcal V)=\lim_{\delta\searrow0}\overline{P}(\mathcal V)$ therefore follow.
 \end{proof}
 %
-For general polytopes~$\mathcal V\subseteq\mathbb R^d$ evaluating~$\underline{P}(\mathcal V)$ requires checking, for each $Q_{\bfa i} \subseteq Z$, whether the cube $Q_{\bfa i}$ is a subset of $\mathcal{V}$, where the number of multi-indices~$\bfa{i}\in\mathbb Z^d$ with~$Q_\bfa{i}\cap\mathcal V\neq\emptyset$ can be overestimated by~$D_1D_2\dots D_d \delta^{-d}$.
+For general polytopes~$\mathcal V\subseteq\mathbb R^d$, evaluating~$\underline{P}(\mathcal V)$ requires checking, for each $Q_{\bfa i} \subseteq Z$, whether the cube $Q_{\bfa i}$ is a subset of $\mathcal{V}$, where the number of multi-indices~$\bfa{i}\in\mathbb Z^d$ with~$Q_\bfa{i}\cap\mathcal V\neq\emptyset$ can be overestimated by~$D_1D_2\dots D_d \delta^{-d}$.
 %
 Where $D_i = \{\min_{\overline{x_i},\underline{x_i}} \overline{x_i}-\underline{x_i} : \underline{x_i}\leq x_i\leq\overline{x_i}\; \forall x\in\Omega\}$.
 %
@@ -352,7 +349,7 @@ Checking whether~$Q_\bfa{i}\subseteq\mathcal V$ requires the solution of a linea
 %
 Similarly, checking whether~$\mathcal V\cap Q_\bfa{i}\neq\emptyset$ requires the solution of a linear program with~$d$ decision variables, again becoming intractable for large grids.
 %
-Recall that nonlinear programming solvers would not compute~$\underline{P}(\mathcal V)$ and~$\overline{P}(\mathcal V)$ once but repeatedly throughout the optimisation.
+Recall that nonlinear programming solvers would not compute~$\underline{P}(\mathcal V)$ and~$\overline{P}(\mathcal V)$ once but repeatedly throughout the optimization.
 %
 
 
@@ -362,7 +359,9 @@ Although the relation between~$\mathbb P\{\mathcal V\}$ and~$\mathring{P}(\mathc
 \mathring{P}(\mathcal V)\xrightarrow{\delta\searrow0}\mathbb{P}(\mathcal V).
 \]
 %
-Determining whether a point $c_\bfa{i}$ is contained in a polytope~$\mathcal V$ does not require linear programming methods but simply that $a_k c_\bfa{i}\leq b_k$ holds for all~$k\in\{1,\dots,M\}$.
+Determining whether a point $c_\bfa{i}$ is contained in the polytope~$\mathcal V$ simply requires checking whether 
+%does not require linear programming methods but simply that 
+$a_k c_\bfa{i}\leq b_k$ holds for all~$k\in\{1,\dots,M\}$.
 %
 To do this efficiently let
 \[
@@ -433,7 +432,7 @@ We illustrate the proposed method in a numerical example in the following sectio
 %
 \noindent In order to illustrate the proposed method we use an example motivated by a robust model predictive control approach to a stochastic problem formulation.
 %
-Consider the problem of finding the largest set of states~$\mathcal X$ for the system~$x^+=x+v$ (where $x^+$ denotes the successor state) such that
+Consider the problem of finding the largest set of states~$\mathcal X\subseteq\mathbb R^2$ for the system~$x^+=x+v$ (where $x^+$ denotes the successor state) such that
 \[
 \Pr (x^+\in\mathcal Y) \geq \frac{3}{10}
 \]
@@ -467,10 +466,10 @@ subject to
 %
 where the Pontryagin difference in (\ref{seq:example:original}c) guarantees satisfaction of~$x^+\in\mathcal Y$ for all~$v\in\mathcal V$.
 %
-To apply the proposed method we choose an initialising polytope~$\mathcal V_0$ which defines the combinatorial structure of~$\mathcal V$, for this we use 
+To apply the proposed method we choose an initialising polytope~$\mathcal V_0$ which defines the combinatorial structure of~$\mathcal V$. For this we use 
 %
 \[
-\mathcal V_0 = \conv\left\{\begin{pmatrix}\pm 1\\0 \end{pmatrix},\begin{pmatrix}0\\\pm1\end{pmatrix},\begin{pmatrix}\pm\frac{3}{4}\\\pm\frac{3}{4}\end{pmatrix}\right\}
+\mathcal V_0 = \conv\left\{\begin{pmatrix}\pm 1\\0 \end{pmatrix},\begin{pmatrix}0\\\pm1\end{pmatrix},\begin{pmatrix}\pm\frac{3}{4}\\\pm\frac{3}{4}\end{pmatrix}\right\} 
 \]
 %
 and the index sets~$\mathcal A_i$ are given as~$\mathcal A_i=\{i,i+1\}$ for $i\in\{1,\dots,5\}$ and~$\mathcal A_6=\{1,6\}$ (the numerical values depend on the half-space description employed but may be rearranged).
@@ -525,7 +524,7 @@ The necessary number~$n$ can be upper bounded by the smallest integer satisfying
 %
 Notice that for higher dimensional random variables~$\Phi(1-p,d,n)$ cannot be numerically determined to sufficient accuracy and the upper bound has to be used, which in this case is given by~$\tilde n=26$.
 %
-In order to obtain a set from the~$n$ samples we use the convex hull~$\hat{\mathcal V}=\conv\{v_i\}$ to compare with the result of the optimisation~\eqref{seq:example:original}.
+In order to obtain a set from the~$n$ samples we use the convex hull~$\hat{\mathcal V}=\conv\{v_i\}$ to compare with the result of the optimization~\eqref{seq:example:original}.
 %
 To allow a better comparison we draw $500$~samples and pick~$100$ collections of~$11$ points at random to compute convex hulls for the comparison.
 %
@@ -543,7 +542,7 @@ This implies that a non-uniform grid size such that for each $Q_\bfa{i}$ the mea
 \begin{figure}\centering
 \include{result.tikz}
 \captionsetup{font=small}
-\caption{Outlined in black the result~$\mathcal V$ of the optimisation~\eqref{seq:example:original}, the \textcolor{red}{red points} show samples drawn for this distribution and $100$~red outlined sets are convex hulls of a random selection of~$N=11$ samples such that any~$\textcolor{red}{\hat{\mathcal V}}$ allows statements on~\eqref{seq:example:original} to be made with a confidence larger than~$0.999$.
+\caption{Outlined in black the result~$\mathcal V$ of the optimization~\eqref{seq:example:original}, the \textcolor{red}{red points} show samples drawn for this distribution and $100$~red outlined sets are convex hulls of a random selection of~$N=11$ samples such that any~$\textcolor{red}{\hat{\mathcal V}}$ allows statements on~\eqref{seq:example:original} to be made with a confidence larger than~$0.999$.
 %
 The result for the non-homogeneous grid discussed in Section~\ref{sec:improved:grid} is outlined in~\textcolor{blue}{blue}.}
 \label{fig:example:in:comparison}
@@ -599,7 +598,7 @@ Algorithm~\ref{algo:non:homo:cubes} can reduce the computational overhead signif
 %
 For the same example as in Section~\ref{sec:example} with a non-homogeneous grid satisfying~$\mathfrak{f}_i\leq\frac{1}{20000}$ which yields~$\min_i\{\delta_i\}=\frac{1}{2^7}=0.0078125$,~$\max_i\{\delta_i\}=\frac{1}{2}$ and a total of~$45436$ cubes.
 %
-Since~\eqref{eq:central:approximation:formula} does not depend on the choice of the grid itself the remaining optimisation is unchanged, a single evaluation of~$\mathring{P}(\mathcal V)$ now takes $0.0251$ seconds,
+Since~\eqref{eq:central:approximation:formula} does not depend on the choice of the grid itself the remaining optimization is unchanged, a single evaluation of~$\mathring{P}(\mathcal V)$ now takes $0.0251$ seconds,
 %~$0.025115$, 
 i.e. about five times  faster than the homogeneous counterpart. The resulting set~$\mathcal V$ is shown in \textcolor{blue}{blue} in Figure~\ref{fig:example:in:comparison},
 % and numerical values are reported in Table~\ref{tab:only:table}.
@@ -620,7 +619,7 @@ Both scenario based sets are evaluated on the inhomogeneous grid, with~$\underli
 %
 %
 \begin{figure}\centering
-\ifodd0
+\ifodd1
 \include{grid.tikz}
 \else
 \vspace{88mm}
@@ -628,7 +627,7 @@ Both scenario based sets are evaluated on the inhomogeneous grid, with~$\underli
 \captionsetup{font=small}
 \caption{The inhomogeneous grid generated by Algorithm~\ref{algo:non:homo:cubes} for the values $\max\{\mathfrak{f}_i\}\leq\frac{1}{10000}$ and~$\min\{\delta_i\}\geq\frac{1}{10000}$ which produces~$20404$ cubes.
 %
-Outlined in \textcolor{blue}{blue} the optimised set~$\mathcal V$.}
+Outlined in \textcolor{blue}{blue} the optimized set~$\mathcal V$.}
 \label{fig:inhomogeneous:grid}
 % \vspace{-2em}
 \end{figure}
@@ -654,19 +653,19 @@ Outlined in \textcolor{blue}{blue} the optimised set~$\mathcal V$.}
 
 
 
-\section{Conclusion}\label{sec:conclusion}
+\section{Conclusions}\label{sec:conclusion}
 %
 %
 %
 %
 %
-\noindent In this paper we presented a method to optimise an auxiliary polytope guaranteeing constraint satisfaction of a probabilistic condition, as it could arise in an application of stochastic model predictive control.
+\noindent This paper presents a method of optimizing an auxiliary polytope so as to guarantee satisfaction of probabilistic constraints. Such problems arise, for example, in stochastic model predictive control (see e.g.~\cite{Zhang2015,Fleming2016}).
 %
-To obtain a finite dimensional formulation of the optimisation, we assume a predetermined combinatorial structure of the auxiliary set, which allows for a finite parameterisation. 
+To obtain a finite dimensional formulation of the optimization, we assume a predetermined combinatorial structure of the auxiliary set, which allows for a finite parameterisation. 
 %
 The probabilistic measure of the auxiliary set is approximated using a Riemann-like approximation of the required integral, and by exploiting the fact that numerical integration over a hypercube is significantly simpler than over an arbitrary polytope.
 %
-We presented two methods of obtaining a suitable grid, a homogeneous grid can be generated simply and has an a priori known number of cubes, which could however be intractably large.
+We present two methods of obtaining a suitable grid. A homogeneous grid can be generated simply and has an a priori known number of cubes, which could however be intractably large.
 %
 An inhomogeneous grid can be determined iteratively and will generally produce a smaller number of cubes, although the number of cubes is not a priori known.
 %
@@ -675,11 +674,14 @@ For both methods the synthesis works identically and produced superior results o
 
 
 %
-Similar to many other polytope-based methods the proposed scheme does not scale well with dimension $d$, this is due to the fact that the combinatorial structure itself becomes complex with rising dimension, higher dimensional problems will yield a large number of decision variables and nonlinear constraints.
+Similar to other polytope-based methods, the proposed scheme does not scale well with dimension $d$. This is due to the fact that the combinatorial structure of the auxiliary polytope becomes more complex with rising dimension, so that higher-dimensional problems yield large numbers of decision variables and nonlinear constraints.
 %
-Furthermore, the number of cubes ($Q_\bfa{i}$ or $Q_i$) that have to be evaluated during the optimisation becomes prohibitively large with increasing dimension for both homogeneous and inhomogeneous grids.
+Furthermore, the number of cubes ($Q_\bfa{i}$ or $Q_i$) that must be evaluated during the optimization can become prohibitively large with increasing dimension for homogeneous grids. This is mitigated by using inhomogeneous grids, and the development of more sophisticated grid generation methods is a  topic for future research.
 %
-For both grids proposed here, the sample space was also assumed to be bounded. We note, however, that an inhomogeneous grid could be used in problems with unbounded sample spaces, for example by choosing a bounding box centred at the expected value with probability measure indistinguishable from one to machine precision.
+For both grids proposed here, the sample space was assumed to be bounded. We note, however, that an inhomogeneous grid could be used in problems with unbounded sample spaces, for example by choosing a bounding box centred at the expected value with probability measure indistinguishable (to machine precision) from unity.
 
-\printbibliography
+\bibliographystyle{plain}
+\parskip = 0pt
+\bibliography{MyBib}
+%\printbibliography
 \end{document}
